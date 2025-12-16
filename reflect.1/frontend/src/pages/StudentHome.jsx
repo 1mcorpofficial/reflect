@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button, Card, Badge } from "../components/ui";
 import { Layout } from "../components/Layout";
 import { PageHeader } from "../components/PageHeader";
+import { ActionCard } from "../components/ActionCard";
 import { useAuthStore } from "../stores/authStore";
 import { api } from "../lib/api";
 import { ROUTES } from "../routes";
@@ -10,7 +11,6 @@ import { getTemplate } from "../data/templates";
 
 export default function StudentHome() {
   const { user } = useAuthStore();
-  const navigate = useNavigate();
   const [reflections, setReflections] = useState([]);
   const [classes, setClasses] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -47,7 +47,6 @@ export default function StudentHome() {
 
   return (
     <Layout>
-
       <PageHeader 
         title="Mano refleksijos" 
         subtitle="Peržiūrėkite ir kurkite naujas refleksijas"
@@ -55,43 +54,38 @@ export default function StudentHome() {
 
       {/* Quick actions */}
       <div className="grid md:grid-cols-3 gap-4 mb-8">
-        <Card 
-          className="hover:shadow-lg transition cursor-pointer bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0"
-          onClick={() => navigate(ROUTES.STUDENT_NEW)}
-        >
-          <div className="text-3xl mb-2">✍️</div>
-          <h3 className="font-semibold text-lg">Nauja refleksija</h3>
-          <p className="text-blue-100 text-sm mt-1">Sukurkite savaitės ar pamokos refleksiją</p>
-        </Card>
+        <ActionCard 
+          to={ROUTES.STUDENT_NEW}
+          icon="✍️"
+          title="Refleksija"
+          subtitle="Sukurkite savaitės ar pamokos refleksiją"
+          className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0"
+        />
 
-        <Card 
-          className="hover:shadow-lg transition cursor-pointer"
-          onClick={() => navigate(ROUTES.STUDENT_HISTORY)}
-        >
-          <div className="text-3xl mb-2">📚</div>
-          <h3 className="font-semibold text-lg text-slate-900">Mano istorija</h3>
-          <p className="text-slate-600 text-sm mt-1">Ankstesnės refleksijos</p>
-        </Card>
+        <ActionCard 
+          to={ROUTES.STUDENT_HISTORY}
+          icon="📚"
+          title="Mano istorija"
+          subtitle="Ankstesnės refleksijos"
+        />
 
-        <Card 
-          className="hover:shadow-lg transition cursor-pointer"
-          onClick={() => navigate(ROUTES.STUDENT_TASKS)}
-        >
-          <div className="text-3xl mb-2">📋</div>
-          <h3 className="font-semibold text-lg text-slate-900">Užduotys</h3>
-          <p className="text-slate-600 text-sm mt-1">
-            Mokytojų paskirtos ({tasks.length})
-          </p>
-        </Card>
+        <ActionCard 
+          to={ROUTES.STUDENT_TASKS}
+          icon="📋"
+          title="Mano užduotys"
+          subtitle={`Mokytojų paskirtos (${tasks.length})`}
+        />
       </div>
 
       {/* Recent reflections */}
       <Card className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-lg text-slate-900">Naujausios refleksijos</h2>
-          <Button variant="ghost" size="sm" onClick={() => navigate(ROUTES.STUDENT_HISTORY)}>
-            Visos →
-          </Button>
+          <Link to={ROUTES.STUDENT_HISTORY}>
+            <Button variant="ghost" size="sm">
+              Visos →
+            </Button>
+          </Link>
         </div>
         
         {loading ? (
@@ -101,41 +95,43 @@ export default function StudentHome() {
             <div className="text-4xl mb-3">📝</div>
             <p>Dar neturite refleksijų</p>
             <p className="text-sm mt-1">Pradėkite nuo naujos refleksijos sukūrimo</p>
-            <Button className="mt-4" onClick={() => navigate(ROUTES.STUDENT_NEW)}>
-              Sukurti pirmą refleksiją
-            </Button>
+            <Link to={ROUTES.STUDENT_NEW}>
+              <Button className="mt-4">
+                Sukurti pirmą refleksiją
+              </Button>
+            </Link>
           </div>
         ) : (
           <div className="space-y-3">
             {reflections.map(r => {
               const template = getTemplate(r.templateId);
               return (
-                <div 
-                  key={r.id}
-                  className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition cursor-pointer"
-                  onClick={() => navigate(`/student/reflections/${r.id}`)}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="text-2xl">{template?.icon || '📝'}</div>
-                    <div>
-                      <div className="font-medium text-slate-900">{template?.name || 'Refleksija'}</div>
-                      <div className="text-sm text-slate-500">
-                        {new Date(r.createdAt).toLocaleDateString('lt-LT')}
+                <Link key={r.id} to={`${ROUTES.STUDENT_REFLECTION_DETAIL}`.replace(':id', r.id)}>
+                  <div 
+                    className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="text-2xl">{template?.icon || '📝'}</div>
+                      <div>
+                        <div className="font-medium text-slate-900">{template?.name || 'Refleksija'}</div>
+                        <div className="text-sm text-slate-500">
+                          {new Date(r.createdAt).toLocaleDateString('lt-LT')}
+                        </div>
                       </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {r.taskId && (
+                        <Badge color="amber">📋 Užduotis</Badge>
+                      )}
+                      <Badge color={r.status === 'reviewed' ? 'green' : 'blue'}>
+                        {r.status === 'reviewed' ? '✓ Peržiūrėta' : 'Pateikta'}
+                      </Badge>
+                      {r.teacherComment && (
+                        <Badge color="amber">💬 Komentaras</Badge>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {r.taskId && (
-                    <Badge color="amber">📋 Užduotis</Badge>
-                  )}
-                  <Badge color={r.status === 'reviewed' ? 'green' : 'blue'}>
-                    {r.status === 'reviewed' ? '✓ Peržiūrėta' : 'Pateikta'}
-                  </Badge>
-                  {r.teacherComment && (
-                    <Badge color="amber">💬 Komentaras</Badge>
-                    )}
-                  </div>
-                </div>
+                </Link>
               );
             })}
           </div>

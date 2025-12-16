@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button, Card, Badge } from "../components/ui";
 import { Layout } from "../components/Layout";
 import { PageHeader } from "../components/PageHeader";
+import { ActionCard } from "../components/ActionCard";
 import { useAuthStore } from "../stores/authStore";
 import { api } from "../lib/api";
 import { ROUTES } from "../routes";
 
 export default function TeacherHome() {
   const { user } = useAuthStore();
-  const navigate = useNavigate();
   const [reflections, setReflections] = useState([]);
   const [classes, setClasses] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -48,32 +48,27 @@ export default function TeacherHome() {
 
       {/* Quick actions */}
       <div className="grid md:grid-cols-3 gap-4 mb-8">
-        <Card 
-          className="hover:shadow-lg transition cursor-pointer bg-gradient-to-br from-green-500 to-green-600 text-white border-0"
-          onClick={() => navigate(ROUTES.TEACHER_TASKS_NEW)}
-        >
-          <div className="text-3xl mb-2">📋</div>
-          <h3 className="font-semibold text-lg">Nauja užduotis</h3>
-          <p className="text-green-100 text-sm mt-1">Sukurkite refleksijos užduotį klasei</p>
-        </Card>
+        <ActionCard 
+          to={ROUTES.TEACHER_TASKS_NEW}
+          icon="📋"
+          title="Nauja užduotis"
+          subtitle="Sukurkite refleksijos užduotį klasei"
+          className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0"
+        />
 
-        <Card 
-          className="hover:shadow-lg transition cursor-pointer"
-          onClick={() => navigate(ROUTES.TEACHER_CLASSES)}
-        >
-          <div className="text-3xl mb-2">👥</div>
-          <h3 className="font-semibold text-lg text-slate-900">Mano klasės</h3>
-          <p className="text-slate-600 text-sm mt-1">Valdykite mokinių grupes ({classes.length})</p>
-        </Card>
+        <ActionCard 
+          to={ROUTES.TEACHER_CLASSES}
+          icon="👥"
+          title="Mano klasės"
+          subtitle={`Valdykite mokinių grupes (${classes.length})`}
+        />
 
-        <Card 
-          className="hover:shadow-lg transition cursor-pointer"
-          onClick={() => navigate(ROUTES.TEACHER_REVIEW)}
-        >
-          <div className="text-3xl mb-2">📊</div>
-          <h3 className="font-semibold text-lg text-slate-900">Peržiūra</h3>
-          <p className="text-slate-600 text-sm mt-1">Mokinių refleksijos</p>
-        </Card>
+        <ActionCard 
+          to={ROUTES.TEACHER_REVIEW}
+          icon="📊"
+          title="Peržiūra"
+          subtitle="Mokinių refleksijos"
+        />
       </div>
 
       {/* Pending reviews */}
@@ -96,32 +91,33 @@ export default function TeacherHome() {
         ) : (
           <div className="space-y-3">
             {reflections.slice(0, 3).map(r => (
-              <div 
-                key={r.id}
-                className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition cursor-pointer"
-                onClick={() => navigate(`/teacher/reflections/${r.id}`)}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="text-2xl">📝</div>
-                  <div>
-                    <div className="font-medium text-slate-900">{r.studentName}</div>
-                    <div className="text-sm text-slate-500">
-                      {new Date(r.createdAt).toLocaleDateString('lt-LT')}
+              <Link key={r.id} to={`${ROUTES.TEACHER_REFLECTION_DETAIL}`.replace(':id', r.id)}>
+                <div 
+                  className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+                >
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="text-2xl">📝</div>
+                    <div>
+                      <div className="font-medium text-slate-900">{r.studentName}</div>
+                      <div className="text-sm text-slate-500">
+                        {new Date(r.createdAt).toLocaleDateString('lt-LT')}
+                      </div>
                     </div>
                   </div>
+                  <Button size="sm" variant="ghost" asChild>Peržiūrėti →</Button>
                 </div>
-                <Button size="sm" variant="ghost">Peržiūrėti →</Button>
-              </div>
+              </Link>
             ))}
             {reflections.length > 3 && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="w-full"
-                onClick={() => navigate(ROUTES.TEACHER_REVIEW)}
-              >
-                Rodyti visas ({reflections.length}) →
-              </Button>
+              <Link to={ROUTES.TEACHER_REVIEW}>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full"
+                >
+                  Rodyti visas ({reflections.length}) →
+                </Button>
+              </Link>
             )}
           </div>
         )}
@@ -131,13 +127,14 @@ export default function TeacherHome() {
       <Card className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-lg text-slate-900">Mano klasės</h2>
-          <Button 
-            size="sm" 
-            variant="secondary"
-            onClick={() => navigate(ROUTES.TEACHER_CLASSES)}
-          >
-            + Pridėti klasę
-          </Button>
+          <Link to={ROUTES.TEACHER_CLASSES}>
+            <Button 
+              size="sm" 
+              variant="secondary"
+            >
+              + Pridėti klasę
+            </Button>
+          </Link>
         </div>
         
         {loading ? (
@@ -148,22 +145,22 @@ export default function TeacherHome() {
               const colors = ['blue', 'green', 'amber', 'rose', 'purple'];
               const color = colors[idx % colors.length];
               return (
-                <div 
-                  key={cls.id}
-                  className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition cursor-pointer"
-                  onClick={() => navigate(ROUTES.TEACHER_CLASSES)}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 bg-${color}-100 rounded-lg flex items-center justify-center text-${color}-600 font-semibold`}>
-                      {cls.name}
+                <Link key={cls.id} to={ROUTES.TEACHER_CLASSES}>
+                  <div 
+                    className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className={`w-10 h-10 bg-${color}-100 rounded-lg flex items-center justify-center text-${color}-600 font-semibold`}>
+                        {cls.name}
+                      </div>
+                      <div>
+                        <div className="font-medium text-slate-900">{cls.name} klasė</div>
+                        <div className="text-sm text-slate-500">{cls.studentIds?.length || 0} mokiniai</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-medium text-slate-900">{cls.name} klasė</div>
-                      <div className="text-sm text-slate-500">{cls.studentIds.length} mokiniai</div>
-                    </div>
+                    <Button size="sm" variant="ghost" asChild>Peržiūrėti →</Button>
                   </div>
-                  <Button size="sm" variant="ghost">Peržiūrėti →</Button>
-                </div>
+                </Link>
               );
             })}
           </div>
@@ -178,7 +175,7 @@ export default function TeacherHome() {
         </Card>
         <Card className="text-center">
           <div className="text-2xl font-bold text-green-600">
-            {classes.reduce((sum, cls) => sum + cls.studentIds.length, 0)}
+            {classes.reduce((sum, cls) => sum + (cls.studentIds?.length || 0), 0)}
           </div>
           <div className="text-sm text-slate-600">Mokiniai</div>
         </Card>

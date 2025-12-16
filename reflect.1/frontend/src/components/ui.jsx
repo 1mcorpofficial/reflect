@@ -1,7 +1,7 @@
 import clsx from "clsx";
 
-export function Button({ as: Comp = "button", className, variant = "primary", size = "md", ...props }) {
-  const base = "inline-flex items-center justify-center rounded-lg font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50";
+export function Button({ as: Comp = "button", className, variant = "primary", size = "md", asChild = false, children, ...props }) {
+  const base = "inline-flex items-center justify-center rounded-lg font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50 no-underline";
   const variants = {
     primary: "bg-blue-600 text-white hover:bg-blue-700 focus-visible:outline-blue-600",
     secondary: "bg-white text-slate-900 border border-slate-200 hover:border-slate-300 hover:bg-slate-50",
@@ -13,7 +13,13 @@ export function Button({ as: Comp = "button", className, variant = "primary", si
     md: "px-4 py-2 text-sm",
     lg: "px-5 py-3 text-base"
   };
-  return <Comp className={clsx(base, variants[variant], sizes[size], className)} {...props} />;
+  
+  if (asChild) {
+    // When asChild is true, pass className and variant classes to child element
+    return <div className={clsx(base, variants[variant], sizes[size], className)} {...props}>{children}</div>;
+  }
+  
+  return <Comp className={clsx(base, variants[variant], sizes[size], className)} {...props}>{children}</Comp>;
 }
 
 export function Input({ className, ...props }) {

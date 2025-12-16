@@ -1,22 +1,17 @@
-import { useState } from 'react';
-import { LoginPage } from './pages/LoginPage';
-import { HomePage } from './pages/HomePage';
-import { useAuth } from './hooks/useAuth';
+import { useEffect } from 'react';
+import { RouterProvider } from 'react-router-dom';
+import { useAuthStore } from './stores/authStore';
+import { router } from './router';
 
 function App() {
-  const { user, token, login, logout } = useAuth();
-  const [isLoggedIn, setIsLoggedIn] = useState(!!token);
+  const { hydrateFromStorage } = useAuthStore();
 
-  const handleLoginSuccess = (userData, authToken) => {
-    login(userData, authToken);
-    setIsLoggedIn(true);
-  };
+  useEffect(() => {
+    hydrateFromStorage();
+  }, [hydrateFromStorage]);
 
-  if (!isLoggedIn) {
-    return <LoginPage onLoginSuccess={handleLoginSuccess} />;
-  }
-
-  return <HomePage />;
+  return <RouterProvider router={router} />;
 }
 
 export default App;
+

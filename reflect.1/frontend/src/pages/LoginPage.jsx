@@ -85,7 +85,7 @@ export const LoginPage = () => {
           </div>
 
           {/* Dešinė pusė - forma */}
-          <Card className="space-y-6 shadow-xl"
+          <Card className="space-y-6 shadow-xl">
             <div>
               <h2 className="text-2xl font-semibold text-slate-900">Prisijungimas</h2>
               <p className="text-sm text-slate-600 mt-2">
@@ -146,4 +146,5 @@ export const LoginPage = () => {
         </div>
       </div>
     </div>
-
+  );
+};

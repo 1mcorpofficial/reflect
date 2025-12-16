@@ -47,7 +47,7 @@ export function Textarea({ className, ...props }) {
 }
 
 export function Card({ className, ...props }) {
-  return <div className={clsx("rounded-xl border border-slate-200 bg-white p-6 shadow-sm", className)} {...props} />;
+  return <div className={clsx("rounded-xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm hover:shadow-md transition", className)} {...props} />;
 }
 
 export function Badge({ className, color = "slate", children }) {

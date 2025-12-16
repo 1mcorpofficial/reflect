@@ -47,7 +47,7 @@ export default function TeacherHome() {
       />
 
       {/* Quick actions */}
-      <div className="grid md:grid-cols-3 gap-4 mb-8">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
         <ActionCard 
           to={ROUTES.TEACHER_TASKS_NEW}
           icon="📋"
@@ -72,9 +72,9 @@ export default function TeacherHome() {
       </div>
 
       {/* Pending reviews */}
-      <Card className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-lg text-slate-900">Laukia peržiūros</h2>
+      <Card className="mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+          <h2 className="font-semibold text-xl text-slate-900">Laukia peržiūros</h2>
           <Badge color={reflections.length > 0 ? "amber" : "green"}>
             {reflections.length} {reflections.length === 1 ? 'nauja' : 'naujos'}
           </Badge>
@@ -124,9 +124,9 @@ export default function TeacherHome() {
       </Card>
 
       {/* Classes overview */}
-      <Card className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-lg text-slate-900">Mano klasės</h2>
+      <Card className="mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+          <h2 className="font-semibold text-xl text-slate-900">Mano klasės</h2>
           <Link to={ROUTES.TEACHER_CLASSES}>
             <Button 
               size="sm" 
@@ -168,24 +168,24 @@ export default function TeacherHome() {
       </Card>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Card className="text-center">
-          <div className="text-2xl font-bold text-blue-600">{classes.length}</div>
-          <div className="text-sm text-slate-600">Klasės</div>
+          <div className="text-2xl sm:text-3xl font-bold text-blue-600">{classes.length}</div>
+          <div className="text-xs sm:text-sm text-slate-600 mt-2">Klasės</div>
         </Card>
         <Card className="text-center">
-          <div className="text-2xl font-bold text-green-600">
+          <div className="text-2xl sm:text-3xl font-bold text-green-600">
             {classes.reduce((sum, cls) => sum + (cls.studentIds?.length || 0), 0)}
           </div>
-          <div className="text-sm text-slate-600">Mokiniai</div>
+          <div className="text-xs sm:text-sm text-slate-600 mt-2">Mokiniai</div>
         </Card>
         <Card className="text-center">
-          <div className="text-2xl font-bold text-amber-600">{reflections.length}</div>
-          <div className="text-sm text-slate-600">Laukia peržiūros</div>
+          <div className="text-2xl sm:text-3xl font-bold text-amber-600">{reflections.length}</div>
+          <div className="text-xs sm:text-sm text-slate-600 mt-2">Laukia peržiūros</div>
         </Card>
         <Card className="text-center">
-          <div className="text-2xl font-bold text-slate-600">{tasks.length}</div>
-          <div className="text-sm text-slate-600">Aktyvios užduotys</div>
+          <div className="text-2xl sm:text-3xl font-bold text-slate-600">{tasks.length}</div>
+          <div className="text-xs sm:text-sm text-slate-600 mt-2">Aktyvios užduotys</div>
         </Card>
       </div>
     </Layout>

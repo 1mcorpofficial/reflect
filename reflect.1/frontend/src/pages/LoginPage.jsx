@@ -38,65 +38,63 @@ export const LoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-100">
-      <div className="mx-auto flex min-h-screen max-w-5xl items-center px-4">
-        <div className="grid w-full gap-10 md:grid-cols-2 md:items-center">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-5xl">
+        <div className="grid w-full gap-12 md:grid-cols-2 md:items-center">
           {/* Kairė pusė - informacija */}
           <div className="space-y-6">
             <div>
               <p className="text-sm font-semibold text-blue-600 tracking-wide uppercase">Reflectus</p>
-              <h1 className="mt-2 text-4xl font-bold text-slate-900">
-                Sveiki atvykę į refleksijų sistemą
+              <h1 className="mt-3 text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent leading-tight">
+                Sveiki atvykę
               </h1>
-              <p className="mt-4 text-lg text-slate-600">
+              <p className="mt-4 text-lg text-slate-600 leading-relaxed">
                 Mokyklos refleksijų platforma mokiniams ir mokytojams. 
                 Apmąstykite savo mokymąsi ir sekite pažangą.
               </p>
             </div>
             
-            <div className="space-y-3">
+            <div className="space-y-4">
               <p className="text-sm font-medium text-slate-700">
                 🚀 Greitas prisijungimas (demo):
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-col sm:flex-row gap-3">
                 {mockHints.map(h => (
                   <Button 
                     key={h.email} 
                     variant="secondary" 
                     size="md" 
                     onClick={() => fillMock(h.email, h.password)}
-                    className="shadow-sm"
+                    className="shadow-sm flex-1 sm:flex-none"
                   >
                     {h.label}
                   </Button>
                 ))}
               </div>
               <p className="text-xs text-slate-500">
-                Slaptažodis: <code className="bg-slate-100 px-1 py-0.5 rounded">test123</code>
+                Slaptažodis: <code className="bg-slate-100 px-2 py-1 rounded text-slate-700 font-mono">test123</code>
               </p>
             </div>
 
-            <div className="pt-4 border-t border-slate-200">
-              <div className="flex items-center gap-4 text-sm text-slate-600">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                  Demo režimas aktyvus
-                </div>
+            <div className="pt-6 border-t border-slate-200">
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span>Demo režimas aktyvus</span>
               </div>
             </div>
           </div>
 
           {/* Dešinė pusė - forma */}
-          <Card className="space-y-5 shadow-lg">
+          <Card className="space-y-6 shadow-xl"
             <div>
-              <h2 className="text-xl font-semibold text-slate-900">Prisijungimas</h2>
-              <p className="text-sm text-slate-600 mt-1">
-                Įveskite el. paštą ir slaptažodį
+              <h2 className="text-2xl font-semibold text-slate-900">Prisijungimas</h2>
+              <p className="text-sm text-slate-600 mt-2">
+                Įveskite savo duomenis žemiau
               </p>
             </div>
             
-            <form className="space-y-4" onSubmit={onSubmit}>
-              <div className="space-y-1.5">
+            <form className="space-y-5" onSubmit={onSubmit}>
+              <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700">El. paštas</label>
                 <Input 
                   type="email" 
@@ -107,7 +105,7 @@ export const LoginPage = () => {
                 />
               </div>
               
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700">Slaptažodis</label>
                 <Input 
                   type="password" 
@@ -139,7 +137,7 @@ export const LoginPage = () => {
               </Button>
             </form>
 
-            <div className="pt-4 border-t border-slate-100 text-center">
+            <div className="pt-5 border-t border-slate-100 text-center">
               <p className="text-xs text-slate-500">
                 Turite problemų? Kreipkitės į mokyklos administratorių.
               </p>
@@ -148,6 +146,4 @@ export const LoginPage = () => {
         </div>
       </div>
     </div>
-  );
-};
 

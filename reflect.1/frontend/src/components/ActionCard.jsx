@@ -3,13 +3,15 @@ import { Card } from "./ui";
 
 export function ActionCard({ to, icon, title, subtitle, className = "" }) {
   return (
-    <Link to={to} className="block group">
+    <Link to={to} className="block group h-full">
       <Card 
-        className={`hover:shadow-lg hover:border-blue-300 transition cursor-pointer group-hover:scale-105 transform ${className}`}
+        className={`h-full hover:shadow-lg hover:border-blue-300 hover:scale-105 transition-all duration-200 transform cursor-pointer group-hover:shadow-xl ${className}`}
       >
-        <div className="text-3xl mb-2">{icon}</div>
-        <h3 className="font-semibold text-lg">{title}</h3>
-        <p className="text-sm mt-1 opacity-75">{subtitle}</p>
+        <div className="flex flex-col h-full">
+          <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">{icon}</div>
+          <h3 className="font-semibold text-lg text-slate-900 mb-2">{title}</h3>
+          <p className="text-sm text-slate-600 leading-relaxed flex-1">{subtitle}</p>
+        </div>
       </Card>
     </Link>
   );

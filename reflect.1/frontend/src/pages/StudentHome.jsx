@@ -53,7 +53,7 @@ export default function StudentHome() {
       />
 
       {/* Quick actions */}
-      <div className="grid md:grid-cols-3 gap-4 mb-8">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
         <ActionCard 
           to={ROUTES.STUDENT_NEW}
           icon="✍️"
@@ -78,9 +78,9 @@ export default function StudentHome() {
       </div>
 
       {/* Recent reflections */}
-      <Card className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-lg text-slate-900">Naujausios refleksijos</h2>
+      <Card className="mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+          <h2 className="font-semibold text-xl text-slate-900">Naujausios refleksijos</h2>
           <Link to={ROUTES.STUDENT_HISTORY}>
             <Button variant="ghost" size="sm">
               Visos →
@@ -139,24 +139,24 @@ export default function StudentHome() {
       </Card>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Card className="text-center">
-          <div className="text-2xl font-bold text-blue-600">{reflections.length || 0}</div>
-          <div className="text-sm text-slate-600">Refleksijos</div>
+          <div className="text-2xl sm:text-3xl font-bold text-blue-600">{reflections.length || 0}</div>
+          <div className="text-xs sm:text-sm text-slate-600 mt-2">Refleksijos</div>
         </Card>
         <Card className="text-center">
-          <div className="text-2xl font-bold text-green-600">
+          <div className="text-2xl sm:text-3xl font-bold text-green-600">
             {reflections.filter(r => r.status === 'reviewed').length}
           </div>
-          <div className="text-sm text-slate-600">Peržiūrėtos</div>
+          <div className="text-xs sm:text-sm text-slate-600 mt-2">Peržiūrėtos</div>
         </Card>
         <Card className="text-center">
-          <div className="text-2xl font-bold text-amber-600">{tasks.length}</div>
-          <div className="text-sm text-slate-600">Aktyvios užduotys</div>
+          <div className="text-2xl sm:text-3xl font-bold text-amber-600">{tasks.length}</div>
+          <div className="text-xs sm:text-sm text-slate-600 mt-2">Aktyvios užduotys</div>
         </Card>
         <Card className="text-center">
-          <div className="text-2xl font-bold text-slate-600">{classes[0]?.name || '—'}</div>
-          <div className="text-sm text-slate-600">Klasė</div>
+          <div className="text-xl sm:text-2xl font-bold text-slate-600">{classes[0]?.name || '—'}</div>
+          <div className="text-xs sm:text-sm text-slate-600 mt-2">Klasė</div>
         </Card>
       </div>
     </Layout>

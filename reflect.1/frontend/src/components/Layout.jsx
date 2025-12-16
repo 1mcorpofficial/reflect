@@ -20,16 +20,16 @@ export function Layout({ children }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Topbar */}
       <header className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={goHome}>
-            <span className="text-xl font-bold text-blue-600">Reflectus</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+          <button onClick={goHome} className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition">
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">Reflectus</span>
             <Badge color={roleBadgeColor}>{roleLabel}</Badge>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-slate-600">
+          </button>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <span className="text-xs sm:text-sm text-slate-600 hidden sm:inline">
               👋 {user?.name || user?.email}
             </span>
             <Button variant="ghost" size="sm" onClick={handleLogout}>
@@ -40,7 +40,7 @@ export function Layout({ children }) {
       </header>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {children}
       </main>
     </div>

@@ -1,9 +1,17 @@
 import { Link } from "react-router-dom";
 import { Card } from "./ui";
 
-export function ActionCard({ to, icon, title, subtitle, className = "" }) {
+export function ActionCard({ to, icon, title, subtitle, className = "", onClick }) {
+  const handleClick = (e) => {
+    if (onClick) {
+      e.preventDefault();
+      onClick(e);
+      return;
+    }
+  };
+
   return (
-    <Link to={to} className="block group h-full">
+    <Link to={to || "#"} className="block group" onClick={handleClick}>
       <Card 
         className={`h-full hover:shadow-lg hover:border-blue-300 hover:scale-105 transition-all duration-200 transform cursor-pointer group-hover:shadow-xl ${className}`}
       >

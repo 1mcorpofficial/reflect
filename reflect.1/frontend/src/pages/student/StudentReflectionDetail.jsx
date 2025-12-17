@@ -50,6 +50,10 @@ export default function StudentReflectionDetail() {
   }
 
   const template = getTemplate(reflection.templateId);
+  const formatAnswer = (value) => {
+    if (Array.isArray(value)) return value.join(', ');
+    return value || '—';
+  };
 
   return (
     <Layout>
@@ -93,7 +97,7 @@ export default function StudentReflectionDetail() {
                   {field.label}
                 </label>
                 <div className="bg-slate-50 rounded-lg p-4 text-slate-900">
-                  {reflection.answers[field.key] || '—'}
+                  {formatAnswer(reflection.answers[field.key])}
                 </div>
               </div>
             ))}

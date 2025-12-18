@@ -5,31 +5,41 @@ const palette = {
     accent: "bg-blue-500",
     iconBg: "bg-blue-50 text-blue-600",
     text: "text-blue-700",
-    border: "border-blue-100"
+    border: "border-blue-100",
+    halo: "bg-blue-100",
+    ring: "focus-visible:ring-blue-200"
   },
   green: {
     accent: "bg-emerald-500",
     iconBg: "bg-emerald-50 text-emerald-600",
     text: "text-emerald-700",
-    border: "border-emerald-100"
+    border: "border-emerald-100",
+    halo: "bg-emerald-100",
+    ring: "focus-visible:ring-emerald-200"
   },
   amber: {
     accent: "bg-amber-500",
     iconBg: "bg-amber-50 text-amber-600",
     text: "text-amber-700",
-    border: "border-amber-100"
+    border: "border-amber-100",
+    halo: "bg-amber-100",
+    ring: "focus-visible:ring-amber-200"
   },
   rose: {
     accent: "bg-rose-500",
     iconBg: "bg-rose-50 text-rose-600",
     text: "text-rose-700",
-    border: "border-rose-100"
+    border: "border-rose-100",
+    halo: "bg-rose-100",
+    ring: "focus-visible:ring-rose-200"
   },
   slate: {
     accent: "bg-slate-500",
     iconBg: "bg-slate-50 text-slate-600",
     text: "text-slate-700",
-    border: "border-slate-100"
+    border: "border-slate-100",
+    halo: "bg-slate-200",
+    ring: "focus-visible:ring-slate-200"
   }
 };
 
@@ -41,13 +51,16 @@ export function TemplateCard({ template, onSelect }) {
       type="button"
       onClick={() => onSelect(template)}
       className={clsx(
-        "group relative h-full w-full overflow-hidden rounded-2xl border bg-white text-left shadow-sm transition",
+        "group relative h-full w-full overflow-hidden rounded-2xl border bg-white/80 text-left shadow-lg transition backdrop-blur-sm",
         colors.border,
-        "hover:-translate-y-1 hover:shadow-lg"
+        "hover:-translate-y-2 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+        colors.ring
       )}
     >
+      <div className="absolute inset-0 bg-gradient-to-br from-white via-white/85 to-slate-50" />
+      <div className={clsx("absolute -right-16 -top-20 h-36 w-36 rounded-full blur-3xl opacity-30 transition duration-500 group-hover:scale-125", colors.halo)} />
       <div className={clsx("absolute inset-x-0 top-0 h-1", colors.accent)} />
-      <div className="flex h-full flex-col gap-4 p-5">
+      <div className="relative z-10 flex h-full flex-col gap-4 p-5">
         <div className="flex items-center gap-3">
           <div className={clsx("flex h-12 w-12 items-center justify-center rounded-full text-xl", colors.iconBg)}>
             {template.icon}

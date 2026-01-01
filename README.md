@@ -5,7 +5,7 @@ Aplikacija mokiniams atsakyti į refleksijų klausimynus, o mokytojams matyti st
 ## Struktūra
 
 ```
-reflect.1/
+reflect/
 ├── backend/              # Node.js + Express serveris
 │   ├── src/
 │   │   ├── models/      # Duomenų modeliai (jei bus DB)

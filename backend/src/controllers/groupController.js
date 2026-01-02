@@ -1,69 +1,138 @@
-// Mock data (replace with database later)
-const groups = [];
+const Group = require('../models/Group');
+const { logAction } = require('../services/auditService');
 
-const createGroup = (req, res) => {
-  const { name } = req.body;
-  const teacherId = req.user.id;
-
-  if (!name) {
-    return res.status(400).json({ error: 'Group name is required' });
+const generateUniqueCode = async () => {
+  let code;
+  let exists = true;
+  while (exists) {
+    code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const existing = await Group.findOne({ code });
+    exists = !!existing;
   }
-
-  const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-  
-  const newGroup = {
-    id: Date.now().toString(),
-    name,
-    code,
-    teacherId,
-    studentIds: [],
-    createdAt: new Date()
-  };
-
-  groups.push(newGroup);
-  res.status(201).json(newGroup);
+  return code;
 };
 
-const getMyGroups = (req, res) => {
-  const userId = req.user.id;
-  const userRole = req.user.role;
+const createGroup = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const teacherId = req.user.id;
 
-  let userGroups = [];
-  if (userRole === 'teacher') {
-    userGroups = groups.filter(g => g.teacherId === userId);
-  } else {
-    userGroups = groups.filter(g => g.studentIds.includes(userId));
+    if (!name) {
+      return res.status(400).json({ error: 'Group name is required' });
+    }
+
+    const code = await generateUniqueCode();
+
+    const group = await Group.create({
+      name,
+      code,
+      teacherId,
+      studentIds: [],
+    });
+
+    // Log audit
+    await logAction(req.user.id, 'create', 'Group', group._id, {
+      name: group.name,
+      code: group.code,
+    }, req);
+
+    res.status(201).json({
+      id: group._id.toString(),
+      name: group.name,
+      code: group.code,
+      teacherId: group.teacherId.toString(),
+      studentIds: group.studentIds.map(id => id.toString()),
+      createdAt: group.createdAt,
+    });
+  } catch (error) {
+    console.error('Create group error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-
-  res.json(userGroups);
 };
 
-const joinGroup = (req, res) => {
-  const { code } = req.body;
-  const studentId = req.user.id;
+const getMyGroups = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const userRole = req.user.role;
 
-  const group = groups.find(g => g.code === code);
-  if (!group) {
-    return res.status(404).json({ error: 'Group not found' });
+    let groups;
+    if (userRole === 'teacher') {
+      groups = await Group.find({ teacherId: userId });
+    } else {
+      groups = await Group.find({ studentIds: userId });
+    }
+
+    res.json(
+      groups.map(group => ({
+        id: group._id.toString(),
+        name: group.name,
+        code: group.code,
+        teacherId: group.teacherId.toString(),
+        studentIds: group.studentIds.map(id => id.toString()),
+        createdAt: group.createdAt,
+      }))
+    );
+  } catch (error) {
+    console.error('Get my groups error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-
-  if (group.studentIds.includes(studentId)) {
-    return res.status(400).json({ error: 'Already in group' });
-  }
-
-  group.studentIds.push(studentId);
-  res.json({ message: 'Joined group', group });
 };
 
-const getGroupDetails = (req, res) => {
-  const { id } = req.params;
-  const group = groups.find(g => g.id === id);
+const joinGroup = async (req, res) => {
+  try {
+    const { code } = req.body;
+    const studentId = req.user.id;
 
-  if (!group) {
-    return res.status(404).json({ error: 'Group not found' });
+    const group = await Group.findOne({ code: code.toUpperCase().trim() });
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found' });
+    }
+
+    if (group.studentIds.includes(studentId)) {
+      return res.status(400).json({ error: 'Already in group' });
+    }
+
+    group.studentIds.push(studentId);
+    await group.save();
+
+    res.json({
+      message: 'Joined group',
+      group: {
+        id: group._id.toString(),
+        name: group.name,
+        code: group.code,
+        teacherId: group.teacherId.toString(),
+        studentIds: group.studentIds.map(id => id.toString()),
+      },
+    });
+  } catch (error) {
+    console.error('Join group error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
+};
 
-  res.json(group);
+const getGroupDetails = async (req, res) => {
+  try {
+    const group = await Group.findById(req.params.id).populate('teacherId', 'name email').populate('studentIds', 'name email');
+
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found' });
+    }
+
+    res.json({
+      id: group._id.toString(),
+      name: group.name,
+      code: group.code,
+      teacherId: group.teacherId._id.toString(),
+      teacherName: group.teacherId.name,
+      studentIds: group.studentIds.map(s => s._id.toString()),
+      students: group.studentIds.map(s => ({ id: s._id.toString(), name: s.name, email: s.email })),
+      createdAt: group.createdAt,
+    });
+  } catch (error) {
+    console.error('Get group details error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 };
 
 module.exports = { createGroup, getMyGroups, joinGroup, getGroupDetails };

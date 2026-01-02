@@ -6,8 +6,11 @@ import { PageHeader } from "../components/PageHeader";
 import { ActionCard } from "../components/ActionCard";
 import { ReflectionActionDialog } from "../components/ReflectionActionDialog";
 import { PageContainer } from "../components/PageContainer";
+import { ActivityRings } from "../components/Apple";
+import { LineChart } from "../components/Charts";
 import { useAuthStore } from "../stores/authStore";
 import { api } from "../lib/api";
+import { getStudentStats } from "../api/analytics";
 import { ROUTES } from "../routes";
 import { getTemplate } from "../data/templates";
 
@@ -15,6 +18,7 @@ export default function StudentHome() {
   const { user } = useAuthStore();
   const [reflections, setReflections] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showReflectionDialog, setShowReflectionDialog] = useState(false);
 
@@ -26,13 +30,15 @@ export default function StudentHome() {
     if (!user) return;
     
     try {
-      const [reflectionsRes, tasksRes] = await Promise.all([
+      const [reflectionsRes, tasksRes, statsData] = await Promise.all([
         api.listStudentReflections(user.id),
         api.listStudentTasks(user.id),
+        getStudentStats().catch(() => null),
       ]);
       
       setReflections(reflectionsRes.items.slice(0, 10));
       setTasks(tasksRes.items);
+      setStats(statsData);
     } catch (error) {
       console.error('Failed to load data:', error);
     } finally {
@@ -47,7 +53,7 @@ export default function StudentHome() {
         <div className="pointer-events-none absolute right-10 top-10 h-56 w-56 rounded-full bg-emerald-200/35 blur-3xl" />
         <div className="pointer-events-none absolute bottom-10 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-amber-200/30 blur-3xl" />
 
-        <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-8">
+        <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-8 animate-fade-in">
           <PageHeader 
             title="Mano refleksijos" 
             subtitle="Apmąstykite savo mokymąsi ir sekite pažangą"
@@ -173,6 +179,48 @@ export default function StudentHome() {
 
           {/* Stats */}
           <div className="w-full max-w-4xl">
+            <Card className="mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-semibold text-xl text-slate-900">Mano statistika</h2>
+                <Link to={ROUTES.STUDENT_STATS}>
+                  <Button variant="ghost" size="sm">Detaliau →</Button>
+                </Link>
+              </div>
+              
+              {stats && (
+                <div className="flex flex-col md:flex-row items-center gap-8">
+                  <div className="flex-shrink-0">
+                    <ActivityRings
+                      completed={stats.totalReflections > 0 ? (stats.reviewedCount / stats.totalReflections) * 100 : 0}
+                      progress={stats.totalReflections > 0 ? (stats.withComments / stats.totalReflections) * 100 : 0}
+                      goal={stats.averageMood ? (stats.averageMood / 5) * 100 : 0}
+                      size={140}
+                      strokeWidth={10}
+                    />
+                  </div>
+                  
+                  <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-600">{stats.totalReflections || 0}</div>
+                      <div className="text-xs text-slate-600 mt-1">Refleksijos</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600">{stats.reviewedCount || 0}</div>
+                      <div className="text-xs text-slate-600 mt-1">Peržiūrėtos</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-amber-600">{stats.withComments || 0}</div>
+                      <div className="text-xs text-slate-600 mt-1">Komentarai</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-slate-600">{stats.averageMood?.toFixed(1) || '—'}</div>
+                      <div className="text-xs text-slate-600 mt-1">Vid. nuotaika</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </Card>
+            
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <Card className="text-center">
                 <div className="text-2xl sm:text-3xl font-bold text-blue-600">{reflections.length || 0}</div>

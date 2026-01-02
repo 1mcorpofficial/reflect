@@ -79,7 +79,7 @@ export default function TeacherReview() {
         <Card className="text-center py-12">Kraunama...</Card>
       ) : filteredReflections.length === 0 ? (
         <Card className="text-center py-12">
-          <div className="text-5xl mb-4">📝</div>
+          <div className="text-5xl mb-4 animate-bounce-slow">📝</div>
           <p className="text-slate-600">Nėra refleksijų</p>
         </Card>
       ) : (

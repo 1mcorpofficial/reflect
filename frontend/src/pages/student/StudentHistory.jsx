@@ -50,8 +50,8 @@ export default function StudentHistory() {
             Kraunama...
           </Card>
         ) : reflections.length === 0 ? (
-          <Card className="text-center py-12 max-w-3xl mx-auto">
-            <div className="text-5xl mb-4">📝</div>
+          <Card className="text-center py-12 max-w-4xl mx-auto">
+            <div className="text-5xl mb-4 animate-bounce-slow">📝</div>
             <p className="text-slate-600 mb-4">Dar neturite refleksijų</p>
             <Button onClick={() => navigate(ROUTES.STUDENT_NEW)}>
               Sukurti pirmą refleksiją
@@ -69,7 +69,7 @@ export default function StudentHistory() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="text-3xl">{template?.icon || '📝'}</div>
+                      <div className="text-3xl hover:scale-110 transition-transform duration-200 icon-bounce">{template?.icon || '📝'}</div>
                       <div>
                         <h3 className="font-semibold text-lg text-slate-900">
                           {template?.name || 'Refleksija'}

@@ -51,9 +51,12 @@ export function TemplateCard({ template, onSelect }) {
       type="button"
       onClick={() => onSelect(template)}
       className={clsx(
-        "group relative h-full w-full overflow-hidden rounded-2xl border bg-white/80 text-left shadow-lg transition backdrop-blur-sm",
+        "group relative h-full w-full overflow-hidden rounded-2xl border bg-white/80 text-left shadow-lg backdrop-blur-sm",
+        "transition-all duration-300 ease-in-out transform-gpu",
+        "hover:-translate-y-2 hover:shadow-xl hover:shadow-slate-200/50",
+        "active:scale-[0.98]",
         colors.border,
-        "hover:-translate-y-2 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         colors.ring
       )}
     >
@@ -62,7 +65,13 @@ export function TemplateCard({ template, onSelect }) {
       <div className={clsx("absolute inset-x-0 top-0 h-1", colors.accent)} />
       <div className="relative z-10 flex h-full flex-col gap-4 p-5">
         <div className="flex items-center gap-3">
-          <div className={clsx("flex h-12 w-12 items-center justify-center rounded-full text-xl", colors.iconBg)}>
+          <div className={clsx(
+            "flex h-12 w-12 items-center justify-center rounded-full text-xl",
+            "group-hover:scale-110 group-hover:rotate-6",
+            "transition-all duration-300 ease-in-out transform-gpu",
+            "icon-bounce",
+            colors.iconBg
+          )}>
             {template.icon}
           </div>
           <div className="min-w-0">
@@ -81,7 +90,12 @@ export function TemplateCard({ template, onSelect }) {
           <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium">
             Klausimų: {template.fields.length}
           </span>
-          <span className={clsx("font-semibold text-xs", colors.text)}>
+          <span className={clsx(
+            "font-semibold text-xs",
+            "group-hover:translate-x-1",
+            "transition-transform duration-300 ease-in-out",
+            colors.text
+          )}>
             Pasirinkti →
           </span>
         </div>

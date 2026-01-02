@@ -67,7 +67,7 @@ export default function TeacherClasses() {
       />
 
       {showCreate && (
-        <Card className="mb-6 max-w-xl">
+        <Card className="mb-6 max-w-2xl">
           <form className="space-y-3" onSubmit={handleCreateClass}>
             <div className="space-y-1">
               <label className="text-sm font-medium text-slate-700">Klasės pavadinimas</label>
@@ -101,7 +101,7 @@ export default function TeacherClasses() {
         <Card className="text-center py-12">Kraunama...</Card>
       ) : classes.length === 0 ? (
         <Card className="text-center py-12">
-          <div className="text-5xl mb-4">👥</div>
+          <div className="text-5xl mb-4 animate-bounce-slow">👥</div>
           <p className="text-slate-600 mb-4">Dar neturite klasių</p>
           <Button onClick={() => setShowCreate(true)}>Pridėti pirmą klasę</Button>
         </Card>

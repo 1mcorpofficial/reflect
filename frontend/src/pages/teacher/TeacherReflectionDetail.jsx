@@ -97,7 +97,7 @@ export default function TeacherReflectionDetail() {
           <Card>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="text-4xl">{template?.icon || '📝'}</div>
+                <div className="text-4xl hover:scale-110 transition-transform duration-200 icon-bounce">{template?.icon || '📝'}</div>
                 <div>
                   <h2 className="font-semibold text-xl text-slate-900">
                     {template?.name || 'Refleksija'}

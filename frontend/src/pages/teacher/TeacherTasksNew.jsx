@@ -17,7 +17,9 @@ export default function TeacherTasksNew() {
     description: '',
     classId: '',
     templateId: '',
-    dueAt: '',
+    startsAt: '',
+    endsAt: '',
+    privacyMode: 'named',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -50,8 +52,13 @@ export default function TeacherTasksNew() {
     e.preventDefault();
     setError('');
 
-    if (!formData.title || !formData.classId || !formData.templateId) {
+    if (!formData.title || !formData.classId || !formData.templateId || !formData.startsAt || !formData.endsAt) {
       setError('Prašome užpildyti visus privalomus laukus');
+      return;
+    }
+
+    if (new Date(formData.endsAt) <= new Date(formData.startsAt)) {
+      setError('Pabaigos laikas turi būti vėlesnis nei pradžios laikas');
       return;
     }
 
@@ -76,7 +83,7 @@ export default function TeacherTasksNew() {
         subtitle="Sukurkite refleksijos užduotį klasei"
       />
 
-      <Card className="max-w-3xl mx-auto">
+      <Card className="max-w-4xl mx-auto">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-700">
@@ -134,15 +141,50 @@ export default function TeacherTasksNew() {
             </select>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">
+                Pradžios laikas <span className="text-rose-500">*</span>
+              </label>
+              <Input
+                type="datetime-local"
+                value={formData.startsAt}
+                onChange={(e) => handleChange('startsAt', e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">
+                Pabaigos laikas <span className="text-rose-500">*</span>
+              </label>
+              <Input
+                type="datetime-local"
+                value={formData.endsAt}
+                onChange={(e) => handleChange('endsAt', e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-700">
-              Terminas (neprivaloma)
+              Privatumo režimas <span className="text-rose-500">*</span>
             </label>
-            <Input
-              type="date"
-              value={formData.dueAt}
-              onChange={(e) => handleChange('dueAt', e.target.value)}
-            />
+            <select
+              value={formData.privacyMode}
+              onChange={(e) => handleChange('privacyMode', e.target.value)}
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+            >
+              <option value="named">Vardinis (matomas vardas)</option>
+              <option value="pseudo_anon">Pseudonimas (tik mokytojui matomas)</option>
+              <option value="anon_aggregate">Anoniminis agregatas (min. N≥5)</option>
+            </select>
+            <p className="text-xs text-slate-500 mt-1">
+              {formData.privacyMode === 'named' && 'Mokinio vardas matomas mokytojui'}
+              {formData.privacyMode === 'pseudo_anon' && 'Mokinio vardas paslėptas, bet identifikavimas galimas'}
+              {formData.privacyMode === 'anon_aggregate' && 'Rezultatai rodomi tik agreguotai (min. 5 atsakymai)'}
+            </p>
           </div>
 
           {error && (

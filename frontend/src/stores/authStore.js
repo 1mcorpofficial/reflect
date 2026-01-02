@@ -1,6 +1,7 @@
 import { create } from "zustand";
+import { loginUser, getMe } from "../api/auth";
 
-// Mock vartotojai prisijungimui
+// Mock vartotojai prisijungimui (fallback)
 const mockUsers = [
   {
     id: "stu-1",
@@ -28,6 +29,9 @@ const mockUsers = [
   }
 ];
 
+// Feature flag
+const USE_REAL_API = import.meta.env.VITE_USE_REAL_API === 'true';
+
 // Mock prisijungimo funkcija
 async function mockLogin(email, password) {
   await new Promise(res => setTimeout(res, 300)); // Simuliuojame tinklo vėlavimą
@@ -47,9 +51,29 @@ async function mockLogin(email, password) {
   return { token, user: publicUser };
 }
 
+// Real API login
+async function realLogin(email, password) {
+  try {
+    const response = await loginUser(email, password);
+    const { token, user } = response.data;
+    
+    // Store token in localStorage for API client
+    localStorage.setItem('token', token);
+    
+    return { token, user };
+  } catch (error) {
+    const err = new Error(error.response?.data?.error || "Neteisingi prisijungimo duomenys");
+    err.code = "INVALID_CREDENTIALS";
+    throw err;
+  }
+}
+
 // Saugojimas į localStorage
 function saveAuth(data) {
   localStorage.setItem("auth", JSON.stringify(data));
+  if (data.token) {
+    localStorage.setItem("token", data.token);
+  }
 }
 
 function loadAuth() {
@@ -63,6 +87,7 @@ function loadAuth() {
 
 function clearAuth() {
   localStorage.removeItem("auth");
+  localStorage.removeItem("token");
 }
 
 export const useAuthStore = create((set, get) => ({
@@ -73,8 +98,23 @@ export const useAuthStore = create((set, get) => ({
 
   hydrateFromStorage() {
     const saved = loadAuth();
-    if (saved?.user && saved?.token) {
-      set({ user: saved.user, token: saved.token, role: saved.user.role, ready: true });
+    const token = localStorage.getItem("token");
+    
+    if (saved?.user && (saved?.token || token)) {
+      const authToken = token || saved.token;
+      set({ user: saved.user, token: authToken, role: saved.user.role, ready: true });
+      
+      // If using real API, verify token is still valid
+      if (USE_REAL_API && authToken) {
+        getMe().then(response => {
+          set({ user: response.data });
+        }).catch(() => {
+          // Token invalid, clear auth
+          clearAuth();
+          set({ user: null, token: null, role: null, ready: true });
+        });
+      }
+      
       return true;
     } else {
       set({ ready: true });
@@ -83,7 +123,8 @@ export const useAuthStore = create((set, get) => ({
   },
 
   async login(email, password) {
-    const { token, user } = await mockLogin(email, password);
+    const loginFn = USE_REAL_API ? realLogin : mockLogin;
+    const { token, user } = await loginFn(email, password);
     saveAuth({ token, user });
     set({ user, token, role: user.role });
     return { user, token };

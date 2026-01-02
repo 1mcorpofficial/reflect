@@ -1,21 +1,27 @@
-// Vieningas API layer - kol kas naudojame mockApi
+// Vieningas API layer - su feature flag perjungimu
 import * as mockApi from './mockApi';
+import * as realApi from './realApi';
+
+// Feature flag: naudoti tikrą API arba mock
+const USE_REAL_API = import.meta.env.VITE_USE_REAL_API === 'true';
+
+const apiImpl = USE_REAL_API ? realApi : mockApi;
 
 export const api = {
   // Reflections
-  createReflection: mockApi.createReflection,
-  listStudentReflections: mockApi.listStudentReflections,
-  getReflection: mockApi.getReflection,
-  listTeacherReflections: mockApi.listTeacherReflections,
-  addTeacherComment: mockApi.addTeacherComment,
+  createReflection: apiImpl.createReflection,
+  listStudentReflections: apiImpl.listStudentReflections,
+  getReflection: apiImpl.getReflection,
+  listTeacherReflections: apiImpl.listTeacherReflections,
+  addTeacherComment: apiImpl.addTeacherComment,
   
   // Tasks
-  createTask: mockApi.createTask,
-  listStudentTasks: mockApi.listStudentTasks,
-  listTeacherTasks: mockApi.listTeacherTasks,
+  createTask: apiImpl.createTask,
+  listStudentTasks: apiImpl.listStudentTasks,
+  listTeacherTasks: apiImpl.listTeacherTasks,
   
   // Classes
-  listTeacherClasses: mockApi.listTeacherClasses,
-  listStudentClasses: mockApi.listStudentClasses,
-  createClass: mockApi.createClass,
+  listTeacherClasses: apiImpl.listTeacherClasses,
+  listStudentClasses: apiImpl.listStudentClasses,
+  createClass: apiImpl.createClass,
 };

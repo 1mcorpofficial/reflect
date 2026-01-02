@@ -1,26 +1,21 @@
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../../components/Layout";
-import { getAllTemplates } from "../../data/templates";
+import { getTemplate } from "../../data/templates";
 import { getRoute, ROUTES } from "../../routes";
+import { Card } from "../../components/ui";
 
 export default function StudentNewReflection() {
   const navigate = useNavigate();
-  const templates = getAllTemplates();
+  // Studentas gali daryti tik "Savijautos pasitikrinimas" pats
+  // Kitos refleksijos priskiriamos mokytojo per užduotis
+  const moodTemplate = getTemplate('mood');
 
-  const handleSelect = (template) => {
-    navigate(getRoute(ROUTES.STUDENT_NEW_TEMPLATE, { templateId: template.id }));
+  const handleSelect = () => {
+    if (moodTemplate) {
+      navigate(getRoute(ROUTES.STUDENT_NEW_TEMPLATE, { templateId: moodTemplate.id }));
+    }
   };
 
-  const getColorClasses = (color) => {
-    const colors = {
-      blue: { bg: 'bg-blue-50', border: 'border-blue-200', icon: 'bg-blue-100 text-blue-600', accent: 'bg-blue-500', text: 'text-blue-600' },
-      green: { bg: 'bg-emerald-50', border: 'border-emerald-200', icon: 'bg-emerald-100 text-emerald-600', accent: 'bg-emerald-500', text: 'text-emerald-600' },
-      amber: { bg: 'bg-amber-50', border: 'border-amber-200', icon: 'bg-amber-100 text-amber-600', accent: 'bg-amber-500', text: 'text-amber-600' },
-      rose: { bg: 'bg-rose-50', border: 'border-rose-200', icon: 'bg-rose-100 text-rose-600', accent: 'bg-rose-500', text: 'text-rose-600' },
-      slate: { bg: 'bg-slate-50', border: 'border-slate-200', icon: 'bg-slate-100 text-slate-600', accent: 'bg-slate-500', text: 'text-slate-600' },
-    };
-    return colors[color] || colors.slate;
-  };
 
   return (
     <Layout>
@@ -33,49 +28,63 @@ export default function StudentNewReflection() {
           >
             ← Grįžti
           </button>
-          <h1 className="text-2xl font-bold text-slate-900">Nauja refleksija</h1>
-          <p className="text-sm text-slate-500 mt-1">Pasirinkite tipą</p>
+          <h1 className="text-2xl font-bold text-slate-900">Savijautos pasitikrinimas</h1>
+          <p className="text-sm text-slate-500 mt-1">Greitas savijautos patikrinimas kuratoriui</p>
         </div>
 
-        {/* Templates List - Compact Cards */}
-        <div className="space-y-3">
-          {templates.map(template => {
-            const c = getColorClasses(template.color);
-            return (
+        {/* Mood Template Card */}
+        {!moodTemplate ? (
+          <Card className="text-center py-12">
+            <div className="text-4xl mb-4">⚠️</div>
+            <p className="text-slate-600">Savijautos pasitikrinimas nerastas</p>
+          </Card>
+        ) : (
+          <div className="max-w-2xl mx-auto">
+            <Card className="hover:shadow-lg transition-all duration-200">
               <button
-                key={template.id}
-                onClick={() => handleSelect(template)}
-                className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 ${c.border} ${c.bg} hover:shadow-md hover:scale-[1.01] active:scale-[0.99] transition-all duration-150 text-left`}
+                onClick={handleSelect}
+                className="w-full flex items-center gap-4 p-6 text-left"
               >
                 {/* Icon */}
-                <div className={`w-12 h-12 rounded-xl ${c.icon} flex items-center justify-center text-2xl flex-shrink-0`}>
-                  {template.icon}
+                <div className="w-16 h-16 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center text-3xl flex-shrink-0 hover:scale-110 transition-transform duration-200 icon-bounce">
+                  {moodTemplate.icon}
                 </div>
                 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-slate-900">{template.name}</h3>
-                    <span className="text-xs text-slate-400 bg-white px-2 py-0.5 rounded-full">
-                      {template.fields.length} kl.
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold text-xl text-slate-900">{moodTemplate.name}</h3>
+                    <span className="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-full">
+                      {moodTemplate.fields.length} klausimų
                     </span>
                   </div>
-                  <p className="text-sm text-slate-600 mt-0.5 line-clamp-1">{template.description}</p>
+                  <p className="text-sm text-slate-600 mb-3">{moodTemplate.description}</p>
+                  <p className="text-xs text-slate-500">Nuotaika, energija, stresas ir poreikis susisiekti</p>
                 </div>
 
                 {/* Arrow */}
-                <div className={`${c.text} text-lg flex-shrink-0`}>
+                <div className="text-slate-400 text-xl flex-shrink-0 hover:translate-x-1 transition-transform duration-200">
                   →
                 </div>
               </button>
-            );
-          })}
-        </div>
+            </Card>
 
-        {/* Quick tip */}
-        <div className="mt-6 text-center">
-          <p className="text-xs text-slate-400">💡 Galite bet kada išsaugoti ir tęsti vėliau</p>
-        </div>
+            {/* Info about other reflections */}
+            <Card className="mt-6 bg-blue-50 border-blue-200">
+              <div className="flex items-start gap-3">
+                <div className="text-2xl">ℹ️</div>
+                <div>
+                  <h4 className="font-semibold text-sm text-blue-900 mb-1">Kitos refleksijos</h4>
+                  <p className="text-xs text-blue-700">
+                    Kitos refleksijų tipai (Pamokos, Savaitės, Kontrolinio, Projekto) yra priskiriamos mokytojo. 
+                    Peržiūrėkite <button onClick={() => navigate(ROUTES.STUDENT_TASKS)} className="underline font-medium">Mano užduotis</button> puslapį.
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
+
       </div>
     </Layout>
   );

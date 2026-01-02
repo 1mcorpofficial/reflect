@@ -1,0 +1,127 @@
+/* Apple-inspired Design Tokens for Reflectus */
+
+:root {
+  /* === SPACING (8pt grid + 12pt intervals) === */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* === BORDER RADIUS (Apple's rounded corners) === */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* === TYPOGRAPHY (Apple's clear hierarchy) === */
+  --font-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+  
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.6;
+  
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* === COLORS (Light theme - Apple minimalism) === */
+  /* Backgrounds */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f7;
+  --bg-tertiary: #e8e8ed;
+  
+  /* Cards & Surfaces */
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.1);
+  
+  /* Text (WCAG AA compliant - min 4.5:1 contrast) */
+  --text-primary: #1d1d1f; /* #1d1d1f on white = 15.8:1 */
+  --text-secondary: #424245; /* #424245 on white = 10.5:1 (improved from #6e6e73 which was 4.8:1) */
+  --text-tertiary: #6e6e73; /* #6e6e73 on white = 4.8:1 (meets AA for large text) */
+  --text-placeholder: #86868b; /* #86868b on white = 3.7:1 (acceptable for placeholder) */
+  
+  /* Accent (Blue - Apple's signature) */
+  --accent-blue: #007aff;
+  --accent-blue-hover: #0051d5;
+  --accent-blue-light: #e3f2fd;
+  
+  /* Semantic colors */
+  --semantic-green: #34c759;
+  --semantic-amber: #ff9500;
+  --semantic-red: #ff3b30;
+  
+  /* Borders & Dividers */
+  --border-color: rgba(0, 0, 0, 0.1);
+  --divider-color: rgba(0, 0, 0, 0.1);
+
+  /* === SHADOWS (Apple's depth) === */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* === MOTION (Apple's smooth timing) === */
+  --motion-fast: 120ms;
+  --motion-base: 180ms;
+  --motion-slow: 240ms;
+  --motion-ease: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --motion-ease-in: cubic-bezier(0.4, 0.0, 1, 1);
+  --motion-ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+
+  /* === TAP TARGETS (Apple HIG: 44×44pt minimum) === */
+  --tap-target-min: 44px;
+
+  /* === ACTIVITY RINGS (Light theme - Apple Health inspired) === */
+  --ring-completed: #34c759; /* Green - completion */
+  --ring-progress: #007aff; /* Blue - progress */
+  --ring-goal: #ff9500; /* Amber - goal */
+  --ring-bg: #e8e8ed; /* Light gray background for rings */
+  --ring-size: 120px; /* Default ring size */
+  --ring-stroke-width: 8px; /* Ring stroke width */
+}
+
+/* Dark theme support (for future) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #000000;
+    --bg-secondary: #1c1c1e;
+    --bg-tertiary: #2c2c2e;
+    
+    --card-bg: #1c1c1e;
+    --card-border: rgba(255, 255, 255, 0.1);
+    
+    --text-primary: #ffffff;
+    --text-secondary: #98989d;
+    --text-tertiary: #6e6e73;
+    
+    --border-color: rgba(255, 255, 255, 0.1);
+    --divider-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* === REDUCED MOTION (Apple accessibility) === */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

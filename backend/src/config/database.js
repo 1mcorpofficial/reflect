@@ -1,11 +1,16 @@
-// Database configuration
-// (Placeholder for future MongoDB integration)
+const mongoose = require('mongoose');
 
 const initDB = async () => {
+  const mongoUri = process.env.MONGODB_URI;
+  if (!mongoUri) {
+    throw new Error('Missing MONGODB_URI environment variable');
+  }
+
   try {
-    console.log('Database initialized (no DB configured yet)');
+    await mongoose.connect(mongoUri);
+    console.log('✅ MongoDB connected');
   } catch (error) {
-    console.error('Database connection failed:', error);
+    console.error('❌ Database connection failed:', error);
     process.exit(1);
   }
 };

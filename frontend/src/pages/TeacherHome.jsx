@@ -47,7 +47,7 @@ export default function TeacherHome() {
       />
 
       {/* Quick actions */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 animate-fade-in">
         <ActionCard 
           to={ROUTES.TEACHER_TASKS_NEW}
           icon="📋"
@@ -68,6 +68,20 @@ export default function TeacherHome() {
           icon="📊"
           title="Peržiūra"
           subtitle="Mokinių refleksijos"
+        />
+
+        <ActionCard 
+          to={ROUTES.TEACHER_CALENDAR}
+          icon="📅"
+          title="Kalendorius"
+          subtitle="Refleksijų įvykių valdymas"
+        />
+
+        <ActionCard 
+          to={ROUTES.TEACHER_STATS}
+          icon="📊"
+          title="Statistika"
+          subtitle="Analitika ir rodikliai"
         />
       </div>
 

@@ -10,6 +10,7 @@ export const ROUTES = {
   STUDENT_HISTORY: '/student/history',
   STUDENT_REFLECTION_DETAIL: '/student/reflections/:id',
   STUDENT_TASKS: '/student/tasks',
+  STUDENT_STATS: '/student/stats',
   
   // Teacher
   TEACHER_HOME: '/teacher',
@@ -19,6 +20,8 @@ export const ROUTES = {
   TEACHER_REVIEW: '/teacher/review',
   TEACHER_REFLECTION_DETAIL: '/teacher/reflections/:id',
   TEACHER_STATS: '/teacher/stats',
+  TEACHER_CALENDAR: '/teacher/calendar',
+  TEACHER_SCHEDULE_DETAIL: '/teacher/schedules/:id',
 };
 
 // Helper funkcija route su parametrais

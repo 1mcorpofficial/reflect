@@ -1,51 +1,105 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const User = require('../models/User');
 
-// Mock data (replace with database later)
-const users = [];
+const register = async (req, res) => {
+  try {
+    const { email, password, name, role } = req.body;
 
-const register = (req, res) => {
-  const { email, password, name, role } = req.body;
+    if (!email || !password || !name || !role) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
 
-  if (!email || !password || !name || !role) {
-    return res.status(400).json({ error: 'Missing required fields' });
+    // Check if user exists
+    const existingUser = await User.findOne({ email: email.toLowerCase().trim() });
+    if (existingUser) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
+
+    // Hash password
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Create user
+    const user = await User.create({
+      email: email.toLowerCase().trim(),
+      passwordHash,
+      name,
+      role,
+    });
+
+    // Generate token
+    const token = jwt.sign(
+      { id: user._id.toString(), email: user.email, role: user.role },
+      process.env.JWT_SECRET || 'fallback-secret-change-in-production',
+      { expiresIn: '24h' }
+    );
+
+    res.status(201).json({
+      message: 'User registered',
+      token,
+      user: { id: user._id.toString(), email: user.email, name: user.name, role: user.role },
+    });
+  } catch (error) {
+    console.error('Register error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-
-  const existingUser = users.find(u => u.email === email);
-  if (existingUser) {
-    return res.status(400).json({ error: 'User already exists' });
-  }
-
-  const newUser = {
-    id: Date.now().toString(),
-    email,
-    password, // TODO: Hash password with bcryptjs
-    name,
-    role,
-    createdAt: new Date()
-  };
-
-  users.push(newUser);
-  res.status(201).json({ message: 'User registered', user: { id: newUser.id, email, name, role } });
 };
 
-const login = (req, res) => {
-  const { email, password } = req.body;
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-  const user = users.find(u => u.email === email && u.password === password);
-  if (!user) {
-    return res.status(401).json({ error: 'Invalid credentials' });
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Missing email or password' });
+    }
+
+    // Find user
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Check password
+    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Generate token
+    const token = jwt.sign(
+      { id: user._id.toString(), email: user.email, role: user.role },
+      process.env.JWT_SECRET || 'fallback-secret-change-in-production',
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      token,
+      user: { id: user._id.toString(), email: user.email, name: user.name, role: user.role },
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-
-  const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '24h' });
-  res.json({ token, user: { id: user.id, email, name: user.name, role: user.role } });
 };
 
-const getMe = (req, res) => {
-  const user = users.find(u => u.id === req.user.id);
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      id: user._id.toString(),
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      classId: user.classId || null,
+    });
+  } catch (error) {
+    console.error('Get me error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-  res.json({ id: user.id, email: user.email, name: user.name, role: user.role });
 };
 
 module.exports = { register, login, getMe };

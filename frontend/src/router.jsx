@@ -13,6 +13,10 @@ import TeacherReflectionDetail from './pages/teacher/TeacherReflectionDetail';
 import TeacherClasses from './pages/teacher/TeacherClasses';
 import TeacherTasks from './pages/teacher/TeacherTasks';
 import TeacherTasksNew from './pages/teacher/TeacherTasksNew';
+import TeacherCalendar from './pages/teacher/TeacherCalendar';
+import TeacherScheduleDetail from './pages/teacher/TeacherScheduleDetail';
+import TeacherStats from './pages/teacher/TeacherStats';
+import StudentStats from './pages/student/StudentStats';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 export const router = createBrowserRouter([
@@ -69,6 +73,14 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: ROUTES.STUDENT_STATS,
+    element: (
+      <ProtectedRoute requiredRole="student">
+        <StudentStats />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: ROUTES.TEACHER_HOME,
     element: (
       <ProtectedRoute requiredRole="teacher">
@@ -113,6 +125,30 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute requiredRole="teacher">
         <TeacherTasksNew />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: ROUTES.TEACHER_CALENDAR,
+    element: (
+      <ProtectedRoute requiredRole="teacher">
+        <TeacherCalendar />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: ROUTES.TEACHER_SCHEDULE_DETAIL,
+    element: (
+      <ProtectedRoute requiredRole="teacher">
+        <TeacherScheduleDetail />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: ROUTES.TEACHER_STATS,
+    element: (
+      <ProtectedRoute requiredRole="teacher">
+        <TeacherStats />
       </ProtectedRoute>
     ),
   },

@@ -1,0 +1,83 @@
+Reflectus pokalbis (transkriptas)
+Data: 2026-01-04
+Įtrauktos žinutės ir vartotojo įkeltos nuotraukos šiame pokalbyje.
+Vartotojas: įkeltos nuotraukos (Reflectus pavyzdžiai)
+
+Nuotrauka 1: 33392B39-5659-4F09-AFF7-786DD1379112.jpeg
+
+Nuotrauka 2: 26F68204-2A09-40F1-9525-18265D89560A.jpeg
+
+Nuotrauka 3: 759FAA67-839D-4D73-A6C3-F767894409E4.jpeg
+
+Nuotrauka 4: 6A8F411B-E3D7-416F-9F22-EF1B3960670E.jpeg
+
+Nuotrauka 5: E37A0BFE-D406-412F-8EA1-76D9F525A309.jpeg
+
+Nuotrauka 6: E027E46C-B1F5-4580-8F94-010F2D6A2806.jpeg
+
+Vartotojas:
+Toks dalykas. Tokia programėle. Tunteflektuoji. Ir mokytoja mato visa. Ir gana. Ir žino
+kaip tau sekasi mokintis. Ir taip toliau. Norėčiau sukurti tokią programėlę, nes Reflectus
+labai sena. Niekas neprižiūri.
+Asistentas:
+Suprantu idėją:
+tai mokyklinė refleksijų sistema – mokytojas kuria klausimynus, mokiniai telefone
+„atsakinėja“, o mokytojas mato statistiką ir progreso grafikus. Tu nori šiuolaikiškos,
+prižiūrimos versijos, nes Reflectus senas ir „sudrožtas“.
+Siūlau taip:
+1) Ką tiksliai daro nauja programėlė: rolės (mokinys, mokytojas, admin), PWA,
+anonimiškumas/vardinis režimas.
+2) MVP: mokytojo web + mokinio mobilus web (grupės kodas, klausimynai, statistika).
+3) Techninis planas: Node/Express + MongoDB + React PWA, vėliau Expo/React Native.
+4) Saugumas ir teisė: GDPR, minimalūs duomenys, aiškios taisyklės.
+5) Toliau: ekranų sąrašas + API sąrašas + karkasas.
+Vartotojas: įkeltos nuotraukos (grupė ir statistika)
+
+Nuotrauka 1: 4FEE3529-56F8-477D-8B9A-92D55762D2A8.jpeg
+
+Nuotrauka 2: E14C4057-9886-4B66-804B-DF19D73851FA.jpeg
+
+Vartotojas:
+Programėlė kurioje galima reflektuoti pamokos turinį. Ir kaip praėjo pamoka
+Asistentas:
+MVP funkcijos ir ekranai:
+- Mokinys: prisijungimas, grupės kodas, mano grupės, aktyvūs klausimynai, užpildymas.
+- Mokytojas: grupės, klausimyno kūrimas, rezultatai (15/20), bendra statistika.
+API (santrauka):
+- Auth: /api/auth/register, /api/auth/login, /api/auth/me
+- Grupės: /api/groups, /api/groups/join, /api/groups/:id
+- Klausimynai: /api/questionnaires, /api/questionnaires/:id
+- Atsakymai: /api/questionnaires/:id/responses, /summary
+Vartotojas:
+https://github.com/1mcorpofficial/reflect.git
+gerai sukūriau repositary. ir sukuriau folderius ant kompiuterio. dabar sujungim juos per
+vs code
+Asistentas:
+VS Code Terminal:
+[bash]
+cd ~/projektai/reflect
+git init
+cat > .gitignore <<'EOF'
+node_modules/
+dist/
+build/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+EOF
+git remote add origin https://github.com/1mcorpofficial/reflect.git
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git push -u origin main
+Jei GitHub'e yra README ir meta konfliktą:
+[bash]
+git pull --rebase origin main
+git push -u origin main
+
+Vartotojas:
+sudek visa sita pokalbi i pdf faila.
+
+

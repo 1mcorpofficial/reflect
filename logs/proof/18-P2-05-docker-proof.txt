@@ -1,0 +1,58 @@
+P2-05: Docker app + compose + healthcheck
+Proof log: 2026-01-11
+
+=== REPRODUCE ===
+
+1. Dockerfile:
+   - Multi-stage build (builder + runner) ✅
+   - Node 20 Alpine ✅
+   - Non-root user (nextjs:nodejs) ✅
+   - Healthcheck endpoint ✅
+   - Production dependencies only ✅
+
+2. docker-compose.prod.yml:
+   - App service + DB service ✅
+   - Healthchecks ✅
+   - Volumes, networks ✅
+   - Environment variables ✅
+   - depends_on with condition ✅
+
+3. Health endpoint:
+   - GET /api/health ✅
+   - Returns: { status: "ok", db: "ok", timestamp } ✅
+   - Used by Docker healthcheck ✅
+
+=== ACCEPTANCE CHECK ===
+
+Expected behavior:
+- docker compose up (prod compose) works
+- /api/health endpoint responds
+- Smoke test passes
+
+=== CODE VERIFICATION ===
+
+1. Dockerfile:
+   - Dockerfile: multi-stage build ✅
+   - Non-root user ✅
+   - Healthcheck ✅
+
+2. docker-compose.prod.yml:
+   - App and DB services ✅
+   - Healthchecks ✅
+   - Environment variables ✅
+
+3. Health endpoint:
+   - src/app/api/health/route.ts ✅
+   - Returns status and DB check ✅
+
+=== STATUS ===
+
+Dockerfile: ✅ DONE
+docker-compose.prod.yml: ✅ DONE
+Health endpoint: ✅ DONE
+Runtime proof: ⏳ PENDING (requires docker compose up + smoke test)
+
+NOTE: Runtime proof requires:
+1. docker compose -f docker-compose.prod.yml up
+2. Test /api/health endpoint
+3. Run smoke test against containerized app

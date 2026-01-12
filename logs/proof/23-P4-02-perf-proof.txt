@@ -1,0 +1,39 @@
+P4-02: Perf baseline (analytics caching)
+Proof log: 2026-01-11
+
+=== REPRODUCE ===
+
+1. Analytics snapshot caching:
+   - AnalyticsSnapshot model in schema ✅
+   - Latest snapshot lookup (when no from/to filters) ✅
+   - Snapshot creation after computation ✅
+   - Version field for schema changes ✅
+
+2. Performance optimization:
+   - Snapshot used when no date filters ✅
+   - Reduces DB queries for repeated analytics calls ✅
+   - Fresh computation when from/to filters present ✅
+
+=== CODE VERIFICATION ===
+
+1. prisma/schema.prisma:
+   - AnalyticsSnapshot model ✅
+
+2. src/app/api/activities/[activityId]/analytics/route.ts:
+   - Latest snapshot lookup (line 61-67) ✅
+   - Snapshot return (line 69-74) ✅
+   - Snapshot creation (line 267-273) ✅
+   - Version: SNAPSHOT_VERSION = 2 ✅
+
+=== ACCEPTANCE CHECK ===
+
+Expected behavior:
+- Analytics without filters returns cached snapshot
+- Analytics with from/to filters computes fresh data
+- Response time stable with 1000+ responses
+
+=== STATUS ===
+
+Snapshot caching: ✅ DONE
+Performance optimization: ✅ DONE
+Runtime proof: ⏳ PENDING (requires server + 1000+ responses test)

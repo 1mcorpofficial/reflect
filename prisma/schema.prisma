@@ -1,0 +1,324 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  previewFeatures = []
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PrivacyMode {
+  NAMED
+  ANONYMOUS
+}
+
+enum OrgRole {
+  ORG_ADMIN
+  FACILITATOR
+}
+
+enum MemberStatus {
+  INVITED
+  ACTIVE
+}
+
+enum ActivityStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+}
+
+enum QuestionType {
+  TRAFFIC_LIGHT
+  EMOTION
+  SCALE
+  THERMOMETER
+  MULTI_SELECT
+  PIE_100
+  SENTENCE_COMPLETION
+  FREE_TEXT
+}
+
+enum ExportFormat {
+  CSV
+  JSON
+  PDF
+  XLSX
+}
+
+enum ExportStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum AnswerStatus {
+  ANSWERED
+  UNKNOWN
+  DECLINED
+}
+
+model User {
+  id           String              @id @default(uuid())
+  email        String              @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  groups       Group[]             @relation("UserGroups")
+  activities   Activity[]          @relation("ActivityCreatedBy")
+  invites      ParticipantInvite[]
+  auditLogs    AuditLog[]          @relation("UserAudit")
+  exports      DataExport[]        @relation("ExportsCreated")
+  orgMemberships OrgMember[]
+  organizationsCreated Organization[] @relation("OrgCreatedBy")
+}
+
+model Participant {
+  id          String              @id @default(uuid())
+  displayName String
+  email       String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  memberships GroupParticipant[]
+  responses   Response[]
+  invites     ParticipantInvite[]
+}
+
+model Organization {
+  id        String      @id @default(uuid())
+  name      String
+  slug      String      @unique
+  createdById String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  createdBy User?       @relation("OrgCreatedBy", fields: [createdById], references: [id])
+  members   OrgMember[]
+  groups    Group[]
+}
+
+model OrgMember {
+  id          String      @id @default(uuid())
+  orgId       String
+  userId      String
+  role        OrgRole
+  status      MemberStatus @default(INVITED)
+  invitedAt   DateTime    @default(now())
+  activatedAt DateTime?
+
+  org         Organization @relation(fields: [orgId], references: [id])
+  user        User         @relation(fields: [userId], references: [id])
+
+  @@unique([orgId, userId])
+  @@index([orgId])
+}
+
+model Group {
+  id           String               @id @default(uuid())
+  orgId        String
+  name         String
+  code         String               @unique
+  description  String?
+  createdById  String?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  createdBy    User?                @relation("UserGroups", fields: [createdById], references: [id])
+  organization Organization         @relation(fields: [orgId], references: [id])
+  participants GroupParticipant[]
+  activities   Activity[]
+  invites      ParticipantInvite[]
+  responses    Response[]
+  exports      DataExport[]
+
+  @@index([orgId])
+}
+
+model GroupParticipant {
+  id               String          @id @default(uuid())
+  groupId          String
+  participantId    String
+  personalCodeHash String
+  personalCodeLookup String        @unique
+  joinedAt         DateTime        @default(now())
+
+  group            Group           @relation(fields: [groupId], references: [id])
+  participant      Participant     @relation(fields: [participantId], references: [id])
+  responses        Response[]
+  auditLogs        AuditLog[]      @relation("ParticipantAudit")
+
+  @@unique([groupId, participantId])
+  @@index([groupId])
+  @@index([personalCodeLookup])
+}
+
+model ParticipantInvite {
+  id            String      @id @default(uuid())
+  groupId       String
+  displayName   String
+  email         String?
+  codeHash      String
+  createdById   String?
+  participantId String?
+  expiresAt     DateTime?
+  redeemedAt    DateTime?
+  createdAt     DateTime    @default(now())
+
+  group         Group       @relation(fields: [groupId], references: [id])
+  createdBy     User?       @relation(fields: [createdById], references: [id])
+  participant   Participant? @relation(fields: [participantId], references: [id])
+
+  @@index([groupId])
+}
+
+model Activity {
+  id             String          @id @default(uuid())
+  groupId        String
+  createdById    String?
+  title          String
+  description    String?
+  privacyMode    PrivacyMode
+  status         ActivityStatus  @default(DRAFT)
+  openAt         DateTime?
+  closeAt        DateTime?
+  timezone       String?
+  scheduledFor   DateTime?
+  publishedAt    DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  group          Group           @relation(fields: [groupId], references: [id])
+  createdBy      User?           @relation("ActivityCreatedBy", fields: [createdById], references: [id])
+  questionnaire  Questionnaire?
+  responses      Response[]
+  exports        DataExport[]
+  analytics      AnalyticsSnapshot[]
+
+  @@index([groupId, status])
+  @@index([openAt])
+  @@index([closeAt])
+}
+
+model Questionnaire {
+  id          String      @id @default(uuid())
+  activityId  String      @unique
+  title       String?
+  createdAt   DateTime    @default(now())
+
+  activity    Activity    @relation(fields: [activityId], references: [id])
+  questions   Question[]
+}
+
+model Question {
+  id               String       @id @default(uuid())
+  questionnaireId  String
+  prompt           String
+  helperText       String?
+  type             QuestionType
+  order            Int
+  config           Json?
+  followUp         Json?
+  required         Boolean      @default(true)
+  createdAt        DateTime     @default(now())
+
+  questionnaire    Questionnaire @relation(fields: [questionnaireId], references: [id])
+  answers          Answer[]
+
+  @@index([questionnaireId, order])
+}
+
+model Response {
+  id                  String           @id @default(uuid())
+  activityId          String
+  groupId             String
+  groupParticipantId  String?
+  participantId       String?
+  isAnonymous         Boolean          @default(false)
+  submissionKey       String?          @unique
+  submittedAt         DateTime?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  activity            Activity         @relation(fields: [activityId], references: [id])
+  group               Group            @relation(fields: [groupId], references: [id])
+  groupParticipant    GroupParticipant? @relation(fields: [groupParticipantId], references: [id])
+  participant         Participant?     @relation(fields: [participantId], references: [id])
+  answers             Answer[]
+
+  @@index([activityId])
+  @@index([participantId])
+  @@index([groupParticipantId])
+  @@unique([activityId, participantId])
+  @@unique([activityId, groupParticipantId])
+}
+
+model Answer {
+  id          String    @id @default(uuid())
+  responseId  String
+  questionId  String
+  value       Json?
+  textValue   String?
+  numberValue Float?
+  status      AnswerStatus @default(ANSWERED)
+  meta        Json?
+  createdAt   DateTime  @default(now())
+
+  response    Response  @relation(fields: [responseId], references: [id])
+  question    Question  @relation(fields: [questionId], references: [id])
+
+  @@unique([responseId, questionId])
+}
+
+model AnalyticsSnapshot {
+  id         String    @id @default(uuid())
+  activityId String
+  computedAt DateTime  @default(now())
+  version    Int       @default(1)
+  from       DateTime?
+  to         DateTime?
+  payload    Json
+
+  activity   Activity  @relation(fields: [activityId], references: [id])
+
+  @@index([activityId, computedAt])
+}
+
+model DataExport {
+  id           String         @id @default(uuid())
+  groupId      String?
+  activityId   String?
+  createdById  String?
+  format       ExportFormat
+  status       ExportStatus   @default(PENDING)
+  location     String?
+  errorMessage String?
+  createdAt    DateTime       @default(now())
+  completedAt  DateTime?
+
+  group        Group?         @relation(fields: [groupId], references: [id])
+  activity     Activity?      @relation(fields: [activityId], references: [id])
+  createdBy    User?          @relation("ExportsCreated", fields: [createdById], references: [id])
+
+  @@index([groupId])
+  @@index([activityId])
+}
+
+model AuditLog {
+  id                   String           @id @default(uuid())
+  action               String
+  targetType           String
+  targetId             String?
+  actorUserId          String?
+  actorParticipantId   String?
+  metadata             Json?
+  createdAt            DateTime         @default(now())
+
+  actorUser            User?            @relation("UserAudit", fields: [actorUserId], references: [id])
+  actorParticipant     GroupParticipant? @relation("ParticipantAudit", fields: [actorParticipantId], references: [id])
+
+  @@index([action])
+}

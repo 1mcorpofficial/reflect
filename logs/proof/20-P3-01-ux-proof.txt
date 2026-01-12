@@ -1,0 +1,46 @@
+P3-01: Global spacing + cards + no overflow
+Proof log: 2026-01-11
+
+=== REPRODUCE ===
+
+1. Global spacing tokens:
+   - CSS variables added (--spacing-container, --spacing-section, --spacing-card, --container-max-width) ✅
+   - Responsive spacing: 16px mobile, 20px desktop ✅
+
+2. Container utilities:
+   - .container-app class: max-width 1280px, responsive padding ✅
+   - .page-shell enhanced: max-width 1280px ✅
+   - .section-spacing: vertical spacing ✅
+   - .card-spacing: card padding ✅
+
+3. No overflow:
+   - html, body: overflow-x: hidden ✅
+   - max-width: 100vw ✅
+   - body > *: min-width: 0 ✅
+
+4. Tap targets:
+   - Minimum 44px height/width for buttons, links, inputs ✅
+
+=== CODE CHANGES ===
+
+1. src/app/globals.css:
+   - Added global spacing tokens (CSS variables) ✅
+   - Added .container-app, .section-spacing, .card-spacing utilities ✅
+   - Added overflow-x: hidden prevention ✅
+   - Added minimum tap target sizes ✅
+
+=== ACCEPTANCE CHECK ===
+
+Expected behavior:
+- 320px width -> no horizontal scroll
+- Consistent container padding (16-20px)
+- Cards with proper spacing
+- All interactive elements >= 44px tap target
+
+=== STATUS ===
+
+Global spacing: ✅ DONE
+Container utilities: ✅ DONE
+No overflow: ✅ DONE
+Tap targets: ✅ DONE
+Runtime proof: ⏳ PENDING (requires browser test with 320px width)

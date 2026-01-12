@@ -1,0 +1,45 @@
+P2-08: Minimal integration tests
+Proof log: 2026-01-11
+
+=== REPRODUCE ===
+
+1. Integration tests:
+   - tests/integration/api.test.ts exists ✅
+   - Jest integration test example ✅
+   - Tests: health, login, analytics, export ✅
+
+2. Smoke test script:
+   - scripts/test-api.sh exists ✅
+   - Bash smoke test script ✅
+   - Tests: health, login, groups, activities, analytics ✅
+   - Executable, ready to run ✅
+
+=== ACCEPTANCE CHECK ===
+
+Expected behavior:
+- Test suite green
+- CI green
+
+=== CODE VERIFICATION ===
+
+1. Integration tests:
+   - tests/integration/api.test.ts:
+     - Jest example ✅
+     - Tests: health, login, analytics, export ✅
+
+2. Smoke test:
+   - scripts/test-api.sh:
+     - Bash smoke test ✅
+     - Tests: health, login, groups, activities, analytics ✅
+
+=== STATUS ===
+
+Integration tests: ✅ DONE
+Smoke test script: ✅ DONE
+Runtime proof: ⏳ PENDING (requires server + test run)
+
+NOTE: Runtime proof requires:
+1. Dev server running (npm run dev)
+2. Run tests: npm test (if configured) or jest
+3. Run smoke test: ./scripts/test-api.sh
+4. Verify all tests pass

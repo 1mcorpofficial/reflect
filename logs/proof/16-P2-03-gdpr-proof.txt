@@ -1,0 +1,80 @@
+P2-03: GDPR baseline (export/delete/retention)
+Proof log: 2026-01-11
+
+=== REPRODUCE ===
+
+1. Export endpoint:
+   - GET /api/admin/gdpr/export/[userId] ✅
+   - Admin only (requireAdmin guard) ✅
+   - Exports: user info, activities, org memberships, groups ✅
+   - JSON format with timestamp ✅
+   - Error handling with requestId ✅
+
+2. Delete/anonymize endpoint:
+   - POST /api/admin/gdpr/delete/[userId] ✅
+   - Admin only (requireAdmin guard) ✅
+   - Rate limited (5 requests per 60s) ✅
+   - Anonymizes email: deleted+{userId}@example.invalid ✅
+   - Anonymizes name: "Deleted User" ✅
+   - Audit log entry (no PII) ✅
+
+3. Retention policy:
+   - docs/GDPR.md: retention notes (line 66-79) ✅
+     - User data: retained until explicit deletion ✅
+     - Activity data: retained for historical analytics ✅
+     - Audit logs: retained for security/compliance (no PII) ✅
+     - Future considerations: automated retention, hard-delete, SLA ✅
+
+4. Audit log (no PII):
+   - logAudit function: only IDs, no sensitive data ✅
+   - GDPR delete logs: userId, actorUserId, metadata (strategy, deletedAt) ✅
+   - No email, name, or other PII in audit logs ✅
+
+=== ACCEPTANCE CHECK ===
+
+Expected behavior:
+- Admin can export user data via export endpoint
+- Admin can anonymize user data via delete endpoint
+- Retention policy documented
+- Audit logs contain no PII
+
+=== CODE VERIFICATION ===
+
+1. Export:
+   - src/app/api/admin/gdpr/export/[userId]/route.ts:
+     - GET endpoint with requireAdmin ✅
+     - Exports user, activities, memberships, groups ✅
+     - JSON format with timestamp ✅
+
+2. Delete:
+   - src/app/api/admin/gdpr/delete/[userId]/route.ts:
+     - POST endpoint with requireAdmin ✅
+     - Rate limited (5/60s) ✅
+     - Anonymizes email and name ✅
+     - Audit log entry (no PII) ✅
+
+3. Retention:
+   - docs/GDPR.md:
+     - Retention policy documented (line 66-79) ✅
+     - Future considerations noted ✅
+
+4. Audit log:
+   - src/lib/audit.ts:
+     - logAudit function: only IDs, no PII ✅
+     - GDPR delete logs: userId, actorUserId, metadata ✅
+
+=== STATUS ===
+
+Export endpoint: ✅ DONE
+Delete endpoint: ✅ DONE
+Retention policy: ✅ DONE
+Audit log (no PII): ✅ DONE
+Runtime proof: ⏳ PENDING (requires server + admin login)
+
+NOTE: Runtime proof requires:
+1. Dev server running (npm run dev)
+2. Admin login
+3. Test export endpoint: GET /api/admin/gdpr/export/{userId}
+4. Test delete endpoint: POST /api/admin/gdpr/delete/{userId}
+5. Verify retention policy in docs/GDPR.md
+6. Verify audit logs contain no PII

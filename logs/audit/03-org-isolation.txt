@@ -1,0 +1,18 @@
+Using BASE=http://localhost:3005
+--- facilitator login (A) ---
+{"user":{"id":"265dac0f-38c9-427e-a693-c6a597ea89e6","email":"demo@reflectus.local","name":"Demo Facilitator"},"org":{"id":"default-org","name":"Default Organization","slug":"default-org"}}
+--- create org B (new org context) ---
+{"org":{"id":"f383bd12-a2bc-4127-8f80-0f7ecbbef9e7","name":"Org Isolation B 1768140018","slug":"org-isolation-b-1768140018"},"orgRole":"ORG_ADMIN"}
+--- create group (A) ---
+{"group":{"id":"5af3f31c-6688-42f6-a4cd-ea47902b70b2","name":"Org A Group","description":"Isolation test","code":"WBK5E7","createdAt":"2026-01-11T14:00:25.370Z"}}Group ID: 5af3f31c-6688-42f6-a4cd-ea47902b70b2
+
+--- create activity (A) ---
+{"activity":{"id":"17206bfd-9d70-454e-87d6-ca187e108554","questionnaireId":"9de5e595-41d7-4023-93bf-612fc05ddaa8"}}Activity ID: 17206bfd-9d70-454e-87d6-ca187e108554
+
+--- cross-org checks (B should be forbidden) ---
+B groups list HTTP 200
+B group participants HTTP 403
+B analytics HTTP 403
+B export HTTP 403
+
+Org isolation check complete.

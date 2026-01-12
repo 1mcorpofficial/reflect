@@ -1,0 +1,51 @@
+P3-02: Empty/loading/error states
+Proof log: 2026-01-11
+
+=== REPRODUCE ===
+
+1. Dashboard:
+   - Empty state: "Nėra grupių" card (line 522-531) ✅
+   - Empty state: "Pasirinkite veiklą" card (line 543-552) ✅
+   - Empty state: "Nėra suvestinių" card (line 705-714) ✅
+   - Empty state: "Nėra klausimų" in analytics (line 603-605) ✅
+   - Loading: status messages ("Kraunama...", "Pateikiama...") ✅
+   - Error: status messages with error text ✅
+
+2. Participant page:
+   - Empty state: "Nėra aktyvių veiklų" (line 192-199) ✅
+   - Empty state: "Dar neturi pateiktų vardinių refleksijų" (line 525-529) ✅
+   - Loading: isSubmitting state ✅
+   - Error: status messages ✅
+
+3. Facilitator page:
+   - Loading: loadStatus, loading state ✅
+   - Error: error state, loadStatus with error message ✅
+
+=== CODE VERIFICATION ===
+
+1. src/app/dashboard/page.tsx:
+   - Empty states for groups, activities, analytics ✅
+   - Loading states via status messages ✅
+   - Error states via status messages ✅
+
+2. src/app/participant/page.tsx:
+   - Empty state for no activities ✅
+   - Empty state for no history ✅
+   - Loading/error via status messages ✅
+
+3. src/app/facilitator/(protected)/page.tsx:
+   - Loading/error states ✅
+
+=== ACCEPTANCE CHECK ===
+
+Expected behavior:
+- Empty states: clear messages when no data
+- Loading states: indicators during async operations
+- Error states: clear error messages
+
+=== STATUS ===
+
+Empty states: ✅ DONE
+Loading states: ✅ DONE
+Error states: ✅ DONE
+Runtime proof: ⏳ PENDING (requires manual UX pass)

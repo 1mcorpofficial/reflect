@@ -1,0 +1,62 @@
+P1-06: Analytics trend (from/to)
+Proof log: 2026-01-11
+
+=== REPRODUCE ===
+
+1. Backend trend:
+   - Analytics route: trend generation (line 239-256) ✅
+     - Calculated when from/to params provided ✅
+     - Groups responses by date (YYYY-MM-DD) ✅
+     - Returns array with date, responses count, completionRate ✅
+     - Sorted by date ✅
+
+2. Dashboard date filters:
+   - fromDate and toDate state (line 116-117) ✅
+   - Date input fields (line 463-480) ✅
+   - buildAnalyticsUrl includes from/to params (line 148-164) ✅
+   - Analytics URL built with ISO dates (line 150-160) ✅
+
+3. Dashboard trend display:
+   - Trend card (line 609-638) ✅
+     - Shows when trend array exists ✅
+     - Displays date, responses count, completion rate ✅
+     - Visual progress bar per day ✅
+
+=== ACCEPTANCE CHECK ===
+
+Expected behavior:
+- GET analytics with from/to returns trend array
+- Dashboard date filters update analytics URL
+- Dashboard displays trend per day with progress bars
+
+=== CODE VERIFICATION ===
+
+1. Backend:
+   - src/app/api/activities/[activityId]/analytics/route.ts:
+     - Line 20-23: from/to params parsed from URL ✅
+     - Line 239-256: trend calculation ✅
+     - Line 262-263: from/to included in payload ✅
+
+2. Frontend:
+   - src/app/dashboard/page.tsx:
+     - Line 116-117: fromDate, toDate state ✅
+     - Line 148-164: buildAnalyticsUrl with from/to ✅
+     - Line 463-480: Date input fields ✅
+     - Line 609-638: Trend card display ✅
+     - Line 61: trend in Analytics type ✅
+
+=== STATUS ===
+
+Backend trend: ✅ DONE
+Date filters: ✅ DONE
+Trend display: ✅ DONE
+Runtime proof: ⏳ PENDING (requires server + test scenario)
+
+NOTE: Runtime proof requires:
+1. Dev server running (npm run dev)
+2. Facilitator login
+3. Create activity with responses across multiple days
+4. Navigate to dashboard
+5. Select from/to dates
+6. Verify analytics returns trend array
+7. Verify dashboard displays trend per day

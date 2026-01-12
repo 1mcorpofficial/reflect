@@ -1,0 +1,43 @@
+P4-01: Observability (logging + request id)
+Proof log: 2026-01-11
+
+=== REPRODUCE ===
+
+1. Request ID in errors:
+   - createErrorResponse function: includes requestId in response ✅
+   - getRequestId function: gets from header or generates ✅
+   - x-request-id header in error responses ✅
+
+2. Server logs:
+   - Console errors with requestId ✅
+   - No PII in logs (only IDs) ✅
+   - Stack traces only in development ✅
+
+3. Integration:
+   - Analytics route: uses createErrorResponse ✅
+   - Other routes: should use createErrorResponse ✅
+
+=== CODE VERIFICATION ===
+
+1. src/lib/error-handler.ts:
+   - generateRequestId() ✅
+   - getRequestId() ✅
+   - createErrorResponse() ✅
+   - withErrorHandler() ✅
+
+2. src/app/api/activities/[activityId]/analytics/route.ts:
+   - Uses createErrorResponse (line 278) ✅
+
+=== ACCEPTANCE CHECK ===
+
+Expected behavior:
+- Error responses include requestId
+- Server logs include requestId
+- No PII in logs
+
+=== STATUS ===
+
+Request ID in errors: ✅ DONE
+Server logs with requestId: ✅ DONE
+No PII in logs: ✅ DONE
+Runtime proof: ⏳ PENDING (requires server + error scenario)

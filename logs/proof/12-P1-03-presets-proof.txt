@@ -1,0 +1,74 @@
+P1-03: Teacher presets (Lesson/Week/Test/Project)
+Proof log: 2026-01-11
+
+=== REPRODUCE ===
+
+1. Presets definition:
+   - PRESETS array defined with 4 presets (line 95-221):
+     - lesson: "Pamokos refleksija" (TRAFFIC_LIGHT, THERMOMETER, FREE_TEXT)
+     - week: "Savaitės refleksija" (SCALE, MULTI_SELECT, FREE_TEXT)
+     - test: "Kontrolinio refleksija" (TRAFFIC_LIGHT, SCALE, FREE_TEXT)
+     - project: "Projekto refleksija" (TRAFFIC_LIGHT, PIE_100, FREE_TEXT)
+
+2. Preset buttons UI:
+   - Preset buttons rendered in facilitator page (line 500-509) ✅
+   - Each preset button calls applyPreset(preset.id) ✅
+
+3. applyPreset function:
+   - Function defined (line 378-394) ✅
+   - Sets title, description, and questions from preset ✅
+   - Generates unique IDs for questions ✅
+   - Shows status message: "pritaikytas šablonas: [label]" ✅
+
+4. Activity creation:
+   - createActivity function sends questions to API (line 324-376) ✅
+   - Questions are mapped with correct order (line 349-356) ✅
+   - Activity created with DRAFT status (line 361) ✅
+
+=== ACCEPTANCE CHECK ===
+
+Expected behavior:
+- Click preset button -> title, description, questions populated
+- Questions generated with correct types and configs
+- Activity created with preset questions in DB
+- Teacher page shows new activity
+
+=== CODE VERIFICATION ===
+
+1. Presets:
+   - src/app/facilitator/(protected)/[groupId]/page.tsx:
+     - Line 95-221: PRESETS array with 4 presets ✅
+     - Line 378-394: applyPreset function ✅
+     - Line 500-509: Preset buttons UI ✅
+
+2. Preset questions:
+   - lesson: 3 questions (TRAFFIC_LIGHT, THERMOMETER, FREE_TEXT) ✅
+   - week: 3 questions (SCALE, MULTI_SELECT, FREE_TEXT) ✅
+   - test: 3 questions (TRAFFIC_LIGHT, SCALE, FREE_TEXT) ✅
+   - project: 3 questions (TRAFFIC_LIGHT, PIE_100, FREE_TEXT) ✅
+
+3. Question configs:
+   - TRAFFIC_LIGHT: defaultConfig() ✅
+   - THERMOMETER: { min: 1, max: 10 } ✅
+   - SCALE: { min: 1, max: 5, statements: [...] } ✅
+   - MULTI_SELECT: { options: [...], minChoices: 1 } ✅
+   - PIE_100: { categories: [...] } ✅
+   - FREE_TEXT: { placeholder: "..." } ✅
+
+=== STATUS ===
+
+Presets definition: ✅ DONE
+Preset buttons UI: ✅ DONE
+applyPreset function: ✅ DONE
+Question generation: ✅ DONE
+Runtime proof: ⏳ PENDING (requires server + test scenario)
+
+NOTE: Runtime proof requires:
+1. Dev server running (npm run dev)
+2. Facilitator login
+3. Navigate to group page
+4. Click each preset button (lesson, week, test, project)
+5. Verify title, description, questions populated
+6. Click "Sukurti veiklą (DRAFT)"
+7. Verify activity created in DB with preset questions
+8. Verify teacher page shows new activity

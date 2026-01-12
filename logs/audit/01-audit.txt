@@ -1,0 +1,5 @@
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+./scripts/audit.sh: line 47: rg: command not found
+Wrote audit to /home/mcorpofficial/projektai/julios projekt/reflectus-app/docs/audit/AUDIT_CONTEXT.md

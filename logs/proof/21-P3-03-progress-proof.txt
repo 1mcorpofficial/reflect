@@ -1,0 +1,41 @@
+P3-03: Student progress indicator polish
+Proof log: 2026-01-11
+
+=== REPRODUCE ===
+
+1. Progress indicator enhancements:
+   - Enhanced progress bar with percentage overlay ✅
+   - Stepper dots for question navigation (clickable) ✅
+   - Visual states: answered (primary), current (ring), unanswered (muted) ✅
+   - Smooth transitions (duration-300) ✅
+   - Accessible: aria-label for each question button ✅
+
+2. Visual polish:
+   - Rounded container with border and muted background ✅
+   - Percentage displayed in center of progress bar ✅
+   - Question number stepper (1, 2, 3...) with states ✅
+   - Tabular numbers for consistent width ✅
+
+=== CODE CHANGES ===
+
+1. src/app/participant/page.tsx:
+   - Enhanced progress indicator (line 398-437) ✅
+   - Added stepper dots with clickable navigation ✅
+   - Added percentage overlay ✅
+   - Added visual states for answered/current/unanswered ✅
+
+=== ACCEPTANCE CHECK ===
+
+Expected behavior:
+- Clear progress indication (x/y questions)
+- Visual stepper showing current position
+- Clickable question navigation
+- Apple-like polish with smooth transitions
+
+=== STATUS ===
+
+Progress bar polish: ✅ DONE
+Stepper dots: ✅ DONE
+Visual states: ✅ DONE
+Accessibility: ✅ DONE
+Runtime proof: ⏳ PENDING (requires browser test)

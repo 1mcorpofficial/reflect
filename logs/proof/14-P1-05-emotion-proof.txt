@@ -1,0 +1,89 @@
+P1-05: Emotion question type
+Proof log: 2026-01-11
+
+=== REPRODUCE ===
+
+1. Schema:
+   - EMOTION enum in schema.prisma (line 34) ✅
+   - Migration: 20260111123000_emotion_question_type ✅
+
+2. Question types:
+   - EMOTION type in question-types.ts (line 5) ✅
+   - emotionConfigSchema with options (line 39-51) ✅
+   - Default config: 5 emoji options (😀, 🙂, 😐, 🙁, 😞) ✅
+   - QUESTION_TYPE_LABELS: "Emocijos" (line 91) ✅
+   - QUESTION_CONFIG_SCHEMAS: emotionConfigSchema (line 102) ✅
+
+3. UI components:
+   - question-config-editor.tsx: EMOTION editor (line 201-257) ✅
+     - Options editor with label/value inputs ✅
+     - Add/remove options ✅
+   - participant page: EMOTION UI (line 585-612) ✅
+     - Grid layout (2 columns mobile, 3 desktop) ✅
+     - Button-based selection with labels ✅
+     - Default config fallback ✅
+
+4. Analytics:
+   - Analytics route: EMOTION handling (line 148, 150, 166-172) ✅
+     - Treated same as TRAFFIC_LIGHT ✅
+     - Distribution calculated from options ✅
+     - Uses labelMap for display ✅
+
+5. Export:
+   - Export route: EMOTION handled as string value ✅
+     - Same as other text-based types ✅
+     - Value stored as string (emoji or label) ✅
+
+=== ACCEPTANCE CHECK ===
+
+Expected behavior:
+- EMOTION question can be created in builder
+- EMOTION question shows emoji buttons in participant UI
+- EMOTION answer saved to DB
+- EMOTION analytics show distribution with labels
+- EMOTION export includes emoji/label values
+
+=== CODE VERIFICATION ===
+
+1. Schema:
+   - prisma/schema.prisma: EMOTION in QuestionType enum (line 34) ✅
+   - Migration: 20260111123000_emotion_question_type ✅
+
+2. Types:
+   - src/lib/question-types.ts:
+     - EMOTION in QuestionType (line 5) ✅
+     - emotionConfigSchema (line 39-51) ✅
+     - QUESTION_TYPE_LABELS (line 91) ✅
+     - QUESTION_CONFIG_SCHEMAS (line 102) ✅
+
+3. UI:
+   - src/components/question-config-editor.tsx:
+     - EMOTION editor (line 201-257) ✅
+   
+   - src/app/participant/page.tsx:
+     - EMOTION UI (line 585-612) ✅
+
+4. Analytics:
+   - src/app/api/activities/[activityId]/analytics/route.ts:
+     - EMOTION handling (line 148, 150, 166-172) ✅
+
+5. Export:
+   - src/app/api/activities/[activityId]/export/route.ts:
+     - EMOTION handled as string value ✅
+
+=== STATUS ===
+
+Schema: ✅ DONE
+Question types: ✅ DONE
+UI components: ✅ DONE
+Analytics: ✅ DONE
+Export: ✅ DONE
+Runtime proof: ⏳ PENDING (requires server + test scenario)
+
+NOTE: Runtime proof requires:
+1. Dev server running (npm run dev)
+2. Facilitator login
+3. Create activity with EMOTION question
+4. Participant answers emoji
+5. Verify analytics shows distribution with labels
+6. Verify export includes emoji/label values

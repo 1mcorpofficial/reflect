@@ -1,0 +1,342 @@
+Reflectus alternatyve – Pokalbio išrašas
+Sugeneruota: 2026-01-04 07:34
+
+Vartotojas
+apibudink refleksijos tipus kurius kalbejim. visus . ir apibudink labai getai kaip jie atrodo
+ir kaip jie veikia
+Asistentas
+Žemiau – visi refleksijos tipai, kuriuos aptarėm, ir kaip jie atrodo (UI) bei kaip veikia
+(logika + duomenys + mokytojo vaizdas).
+
+1) Pamokos refleksija (po kiekvienos pamokos)
+Kaip atrodo (mokiniui) - Pagrindiniam ekrane – kortelė: „Pamokos
+refleksija“. - Atidarius – vienas klausimas per ekraną (wizard/stepper). Viršuje: pamokos pavadinimas + mokytojas + data + progreso juosta
+(pvz. 3/8). - Apačioje: dideli pasirinkimai (tinkami telefonui), aiškūs
+mygtukai.
+Mini-wireframe:
+Pamokos refleksija • Matematika • 2026-01-02
+[■■■□□□□□□] 3/8
+Kaip aiškiai supratau temą šiandien?
+( ) Puikiai
+( ) Gerai
+( ) Vidutiniškai
+( ) Silpnai
+( ) NENORIU ATSAKYTI
+( ) NEŽINAU
+[Atgal]
+
+[Toliau]
+
+Kaip veikia (logika) - Fokusas: ką supratau / kur strigau / ko reikia. Klausimai trumpi, konkretūs, „be gėdos“. - Rezultatas: pamokos
+santrauka + signalai mokytojui (pvz. „daug kam neaišku“, „reikia
+pakartojimo“).
+Tipiniai klausimų blokai:
+• Supratimas (skalė)
+• Įsitraukimas (skalė)
+• Kas buvo sunkiausia (pasirinkimas + trumpas tekstas)
+• Ko reikia kitą kartą (pasirinkimas)
+• 1 sakinys: „ką išsinešu“ (neprivalomas)
+
+1
+
+Mokytojo pusėje - Matosi: klasės vidurkiai, pasiskirstymas, „raudonos
+vėliavos“ (daug „silpnai“ / daug „nežinau“). - Filtrai: klasė, pamoka,
+data, tema. - Greitas veiksmas: „pakartoti“, „duoti papildomą užduotį“,
+„paaiškinti dar kartą“.
+
+2) Savaitės refleksija (kartą per savaitę)
+Kaip atrodo (mokiniui) - Kortelė: „Savaitės refleksija“ su savaitės
+laikotarpiu. - Daugiau „apžvalginė“, bet vis tiek 1 klausimas per ekraną.
+- Pabaigoje – savaitės santrauka (ką sekėsi, kur klibo, planas kitai
+savaitei).
+Mini-wireframe:
+Savaitės refleksija • 2025-12-29 → 2026-01-04
+[■■□□□□□□] 2/7
+Kaip bendrai sekėsi mokytis šią savaitę?
+( ) Labai gerai
+( ) Gerai
+( ) Vidutiniškai
+( ) Sunkiai
+( ) NENORIU ATSAKYTI
+( ) NEŽINAU
+
+Kaip veikia (logika) - Fokusas: progresas, krūvis, disciplina, emocinė
+būsena mokymosi kontekste. - Išveda „trendą“: lygina su praeita
+savaite (mokytojui). - Sukuria mini planą: „kitą savaitę darysiu X“.
+Tipiniai blokai:
+• Krūvis (per didelis/ok/per mažas)
+• Motyvacija
+• Kurio dalyko reikėjo daugiau pagalbos
+• Namų darbų valdymas
+• Tikslas kitai savaitei (1 pasirinkimas + 1 sakinys)
+
+Mokytojo pusėje - Matosi: savaitiniai trendai, mokinio stabilumas, kas
+„perdegimo“ zonoje. - Klasės mastu: kas „stringa“ – galima koreguoti
+tempą.
+
+3) Kontrolinio refleksija (po testo/kontrolinio)
+Kaip atrodo (mokiniui) - Kortelė: „Kontrolinio refleksija“ su kontrolinio
+pavadinimu ir rezultatu (jei yra). - Klausimai orientuoti į: pasiruošimą →
+atlikimą → klaidas → planą.
+Mini-wireframe:
+
+2
+
+Kontrolinio refleksija • Fizika: Dinamika
+[■■■■□□□□] 4/8
+Kodėl padariau daugiausia klaidų?
+( ) Nes nesupratau temos
+( ) Trūko praktikos
+( ) Skubėjau / stresas
+( ) Neužteko laiko
+( ) Kita: _______
+( ) NENORIU ATSAKYTI
+( ) NEŽINAU
+
+Kaip veikia (logika) - Sukuria „diagnostiką“: ar problema žiniose,
+praktikoje, laike, strese. - Generuoja veiksmą: „ką darysiu iki kito
+kontrolinio“.
+Tipiniai blokai:
+• Kaip ruošiausi (kiek + kaip)
+• Kur strigau (temos)
+• Laiko planavimas
+• Streso lygis
+• 1–2 konkretūs veiksmai kitam kartui
+
+Mokytojo pusėje - Matosi: bendra klaidų priežastis klasėje (pvz. „trūko
+praktikos“ → duoti daugiau pratimų). - Galima grupuoti mokinius pagal
+pagalbos tipą.
+
+4) Projekto darbo refleksija (po projekto etapo arba
+pabaigoje)
+Kaip atrodo (mokiniui) - Kortelė: „Projekto refleksija“ su projekto
+pavadinimu, role (jei komanda), etapu. - Daugiau apie procesą:
+planavimas, indėlis, komunikacija, kas pavyko/ne.
+Mini-wireframe:
+Projekto refleksija • „Aplinkos tarša“ • 2 etapas
+[■■■□□□□] 3/7
+Kaip aiškiai pasidalinom darbais komandoje?
+( ) Labai aiškiai
+( ) Pakankamai
+( ) Neaiškiai
+( ) Buvo chaosas
+( ) NENORIU ATSAKYTI
+( ) NEŽINAU
+
+Kaip veikia (logika) - Vertina ne „teisinga/neteisinga“, o įgūdžius:
+planavimą, bendradarbiavimą, atsakomybę. - Išveda: kas trukdė (laikas,
+rolės, komunikacija) + kaip gerinti kitą etapą.
+Tipiniai blokai:
+
+3
+
+• Rolės / atsakomybės aiškumas
+• Komunikacija
+• Mano indėlis (savivertinimas)
+• Sunkumai (pasirinkimai)
+• Ko reikia iš mokytojo (pagalba / resursai / aiškesnis brief)
+
+Mokytojo pusėje - Matosi: komandos sveikata (ar yra „tempiančių“, ar
+yra konfliktų). - Ankstyvas signalas, kad projektas „byra“ – galima
+įsikišti laiku.
+
+Bendra taisyklė visiems tipams: „NENORIU ATSAKYTI“ ir
+„NEŽINAU“
+„NENORIU ATSAKYTI“ - Leidžiama visur. - Mokytojas mato, kad
+atsakymas sąmoningai nepateiktas (be spaudimo). - Saugumo logika:
+jokių „prievartinių“ detalių.
+„NEŽINAU“ (su nukrypimu ir grąžinimu į klausimą) Veikimo principas: 1)
+Mokinys paspaudžia „Nežinau“ 2) Sistema pateikia 2–3 pagalbinius
+klausimus (labai paprastus) 3) Sistema grąžina į originalų klausimą ir
+prašo pasirinkti jau iš naujo
+Pavyzdys:
+• Originalas: „Kaip aiškiai supratau temą?“ → „Nežinau“
+• Nukrypimas:
+• „Ar galėčiau paaiškinti draugui bent 1 dalį?“ (Taip/Ne)
+• „Kuri vieta sunkiausia?“ (Pasirinkimas)
+• „Ar trūko laiko / dėmesio?“ (Taip/Ne)
+• Grįžta: „Dabar pasirink geriausiai tinkantį variantą.“
+Svarbu: jei po nukrypimo vis tiek neaišku, galima leisti „Nežinau (po pagalbos)“, bet
+mokytojo pusėje tai tampa stipresniu signalu.
+
+Kaip tai „veikia“ sisteminiu lygiu (kad viskas būtų tvarkinga)
+Kiekviena refleksija turi: - `type`: lesson / weekly / test /
+project - `context`: (pamokosId, savaitė, kontrolinioId,
+projektoId/etapas) - `questions[]`: su šakomis (branching)
+„nežinau“ atvejui - `answers[]`: pasirinkimas + (jei reikia)
+tekstas + laikas - `derivedSignals`: automatiniai indikatoriai
+(pvz. „reikia pakartojimo“, „stresas“, „trūko praktikos“)
+Mokytojo dashboard’as remiasi ne vien tekstais, o tais signalais (greita peržiūra + filtrai).
+Vartotojas
+
+4
+
+toliau visas reflesijas. sviesoforas . skale. ir kitos. visos kurias aptar4m. kurios yra
+Asistentas
+Žemiau tęsinys: ne refleksijų „rūšys“ (pamokos/savaitės/kontrolinio/projekto), o
+refleksijų klausimų/atsakymų formatai („šviesoforas“, „skalė“ ir t. t.), kuriuos buvom
+aptarę.
+
+Bendras principas visiems tipams Kiekvienas klausimas turi:
+- aiškų tikslą (ką matuojam: aiškumą, įsitraukimą, nuotaiką,
+pasiūlymus ir pan.) - validacijas (privaloma / ribos / min
+simboliai ir t. t.) - metaduomenis analitikai (tema,
+kontekstas, auditorija) - 2 universalūs pasirinkimai: „Nenoriu
+atsakyti“ ir „Nežinau“ su nukreipiamais klausimais
+„Nežinau“ logika: paspaudus – 1–3 pagalbiniai žingsniai → grįžta į pradinį klausimą ir
+prašo pasirinkti galutinį atsakymą (išimtis: visada galima „Nenoriu atsakyti“).
+
+1) Taip / Ne (arba „Sutinku / Nesutinku“) Kada naudoti: greiti
+faktiniai dalykai arba aiškus teiginys.
+• *Kaip atrodo (UI):**
+• 2 dideli mygtukai + 2 universalūs.
+Ar šiandien supratau pagrindinę idėją?
+[ TAIP ] [ NE ]
+[ NENORIU ATSAKYTI ] [ NEŽINAU ]
+
+• *Kaip veikia (duomenys):**
+• `value: true/false | skip | unknown_final`
+• Mokytojo vaizde: % TAIP, % NE, % skip.
+Grafikai: 2 stulpeliai / donut; laike – TAIP% linija.
+
+2) Šviesoforas (Žalia / Geltona / Raudona) Kada naudoti: kai
+norim 3 būsenų „aiškumo“ arba „situacijos“ (greita ir
+intuityvu).
+• *Kaip atrodo:**
+• 3 dideli pasirinkimai (spalvos gali būti, bet svarbiausia – tekstinės reikšmės).
+Kaip supratau temą?
+[ ŽALIA: supratau ]
+[ GELTONA: iš dalies ]
+[ RAUDONA: nesupratau ]
+[ NENORIU ATSAKYTI ] [ NEŽINAU ]
+
+• *Kaip veikia (duomenys):**
+
+5
+
+• `value: "green"|"yellow"|"red" | skip | unknown_final`
+• Leidžia pervadinti reikšmes (pvz. „gerai/vidutiniškai/blogai“).
+Grafikai: 3 stulpeliai / 100% stacked; laike – kiekvienos spalvos linija.
+
+3) Emocijos (viena arba kelios) Kada naudoti: nuotaika po
+pamokos/savaitės, stresas po kontrolinio, komandos klimatas
+projekte.
+• *Kaip atrodo:**
+• Veidukai/ikonos, galima 1 pasirinkimas arba keli.
+Kaip jaučiuosi po pamokos?
+Džiaugsmingas ὡ Neutralu ὡ Liūdna
+(jei multi – galima pasirinkti 1–3)
+[ NENORIU ATSAKYTI ] [ NEŽINAU ]
+
+Piktas ὣ Nerimas
+
+• *Kaip veikia (duomenys):**
+• Single: `value: "happy" | ...`
+• Multi: `value: ["anxious","tired"]`
+• Papildomai analitikai: grupavimas į teigiama / neutrali / neigiama.
+Grafikai: dažniausių emocijų juostinė; laike – poz/neu/neg trendai.
+
+4) Skalė / termometras (pvz. 1–10) Kada naudoti:
+intensyvumui (aiškumas, krūvis, motyvacija, stresas).
+• *Kaip atrodo:**
+• Slankiklis su žymomis (1–10) arba „blogai–puikiai“.
+Kiek buvo streso? 1 —— 10
+[----●-----] 7
+[ NENORIU ATSAKYTI ] [ NEŽINAU ]
+
+• *Kaip veikia (duomenys):**
+• `value: number` (pvz. 1..10)
+• Validacija: min/max, žingsnis (pvz. tik sveiki).
+Grafikai: histograma/boxplot; laike – vidurkio linija + sklaida.
+
+5) Vieno pasirinkimo sąrašas (single-select) Kada naudoti:
+kai variantų daugiau nei 3 ir reikia vieno.
+• *UI:**
+• Kortelės arba sąrašas su paieška (jei daug).
+
+6
+
+Kas labiausiai trukdė?
+( ) Per greitas tempas
+( ) Per mažai pavyzdžių
+( ) Triukšmas klasėje
+( ) Mano dėmesys
+( ) Kita: ___
+[ NENORIU ATSAKYTI ] [ NEŽINAU ]
+
+Duomenys: value: optionId
+Grafikai: stulpelinė; laike – top N linijos.
+
+6) Daugybinis pasirinkimas (multi-select) Kada naudoti: kai
+vienu metu tinka kelios priežastys/temos.
+• *UI:**
+• Checkbox tipo.
+Kas padėjo šiandien? (pasirink 1–3)
+[ ] Pavyzdžiai
+[ ] Darbas poroje
+[ ] Lėtesnis tempas
+[ ] Konspektas
+[ NENORIU ATSAKYTI ] [ NEŽINAU ]
+
+Duomenys: value: [optionId, ...] + validacija (max pasirinkimų)
+Grafikai: „kiek kartų pasirinkta“ juostinė; laike – kiekvienos parinkties trendas (top N).
+
+7) Atviras tekstas (trumpas / ilgas) Kada naudoti: kai reikia
+konteksto („kas konkrečiai“, „pasiūlymas“, „kas neaišku“).
+• *UI:**
+• Trumpas (1–2 sakiniai) arba ilgas (pastraipa), su aiškiu limitu.
+Kas buvo sunkiausia? (1–2 sakiniai)
+[_____________________]
+[ NENORIU ATSAKYTI ] [ NEŽINAU ]
+
+• *Duomenys:**
+• `value: string`
+• Validacija: min/max simboliai, „ne tuščias“.
+• *Analitika:**
+• Tekstas automatiškai sužymimas į struktūrą (tema, emocija, pasiūlymas, keywords) AI
+pagal JSON, kad būtų grafikai.
+Grafikai: TOP temos, sentimentas laike, trendai.
+
+8) Neužbaigtas sakinys (fill-in) Kada naudoti: kai nori
+priversti formuluoti trumpai, bet kryptingai.
+7
+
+• *UI:**
+• Sistema pateikia pradžią, mokinys užbaigia.
+Užbaik sakinį:
+„Šiandien man labiausiai padėjo ________.“
+[______________]
+[ NENORIU ATSAKYTI ] [ NEŽINAU ]
+
+Duomenys: tekstas kaip string, analitika kaip atviro teksto.
+
+9) Procentinis paskirstymas (100% „pyragas“) Kada naudoti:
+kai norim pasiskirstymo (pvz. kas labiausiai sudarė pamoką /
+kas labiausiai trukdė).
+• *UI:**
+• Slankikliai, kurie visada sumoje = 100%.
+Paskirstyk 100%: kas labiausiai trukdė?
+Tempas:
+40%
+Dėmesys:
+30%
+Triukšmas: 20%
+Kita:
+10%
+(viso 100%)
+[ NENORIU ATSAKYTI ] [ NEŽINAU ]
+
+• *Duomenys:**
+• `value: {optionId: percent, ...}` su validacija: suma = 100.
+Grafikai: stacked 100%; laike – kiekvienos dalies vidurkis %.
+
+Privatumo/rodymo taisyklė analitikoje Kai imtis maža, pvz. N
+< 5, nerodyti per detalių statistikų (privatumas +
+patikimumas), rodyti tik supaprastintą vaizdą arba
+„nepakanka duomenų“.
+Vartotojas
+sudek visa ssita pokalbi i pdf faila
+
+8
+
+

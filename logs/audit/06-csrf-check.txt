@@ -1,0 +1,8 @@
+Started dev server pid=113994
+Dev server ready
+{"user":{"id":"265dac0f-38c9-427e-a693-c6a597ea89e6","email":"demo@reflectus.local","name":"Demo Facilitator"},"org":{"id":"default-org","name":"Default Organization","slug":"default-org"}}
+--- CSRF mismatch (Origin evil) ---
+403
+--- CSRF same-origin (Origin localhost) ---
+201
+CSRF check complete

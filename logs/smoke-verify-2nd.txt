@@ -1,0 +1,19 @@
+Using BASE=http://localhost:3005
+--- facilitator login ---
+{"user":{"id":"cdaf4908-dd00-4a8e-8668-fc8072ce625d","email":"demo@reflectus.local","name":"Demo Facilitator"},"org":{"id":"2581c43a-98fd-4098-93cc-0fcaf8d0fe0b","name":"Reflectus Demo Organizacija","slug":"reflectus-demo"}}
+--- facilitator groups ---
+{"groups":[{"id":"c1166655-ad79-41a1-9e3b-d53ab3cf20a2","name":"Demo Grupė","description":"Pavyzdinė klasė","code":"DEMO1","createdAt":"2026-01-11T18:52:48.405Z"}]}
+--- participant login ---
+{"participant":{"id":"demo-participant","displayName":"Demo Mokinys","group":{"id":"c1166655-ad79-41a1-9e3b-d53ab3cf20a2","name":"Demo Grupė","code":"DEMO1"}}}
+--- participant activities ---
+{"activities":[{"id":"058b476f-71cd-4f4d-880b-5c2c09dfb763","title":"Pamokos refleksija (demo)","description":null,"openAt":null,"closeAt":null,"timezone":null,"privacyMode":"NAMED","status":"PUBLISHED","responses":[],"questionnaire":{"id":"077a4fa0-0f11-41e5-b43a-74d5b5e29b12","questions":[{"id":"22697159-f3ab-4714-b343-0ab5cbb524e7","prompt":"Kaip pavyko pamoka?","helperText":null,"type":"TRAFFIC_LIGHT","required":true,"order":0,"config":{"options":[{"label":"Puikiai","value":"green"},{"label":"Vidutiniškai","value":"yellow"},{"label":"Sunkiai","value":"red"}]},"followUp":null},{"id":"95f14659-6ff5-4dd2-9de3-192e694cf986","prompt":"Koks motyvacijos lygis?","helperText":null,"type":"THERMOMETER","required":true,"order":1,"config":{"max":10,"min":1},"followUp":null}]},"state":"OPEN"}]}
+--- analytics ---
+{"activityId":"058b476f-71cd-4f4d-880b-5c2c09dfb763","trend":[],"perQuestion":[{"type":"TRAFFIC_LIGHT","prompt":"Kaip pavyko pamoka?","average":null,"responses":0,"questionId":"22697159-f3ab-4714-b343-0ab5cbb524e7","distribution":{},"unknownCount":0,"answeredCount":0,"declinedCount":0},{"type":"THERMOMETER","prompt":"Koks motyvacijos lygis?","average":null,"responses":0,"questionId":"95f14659-6ff5-4dd2-9de3-192e694cf986","distribution":{},"unknownCount":0,"answeredCount":0,"declinedCount":0}],"completionRate":0,"totalResponses":0,"totalParticipants":1}
+--- export csv ---
+HTTP/1.1 200 OK
+vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+content-disposition: attachment; filename="activity-058b476f-71cd-4f4d-880b-5c2c09dfb763.csv"
+content-type: text/csv
+Date: Mon, 12 Jan 2026 05:45:51 GMT
+
+Smoke complete.

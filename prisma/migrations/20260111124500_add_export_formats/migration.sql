@@ -1,0 +1,3 @@
+-- Add PDF/XLSX export formats
+ALTER TYPE "ExportFormat" ADD VALUE IF NOT EXISTS 'PDF';
+ALTER TYPE "ExportFormat" ADD VALUE IF NOT EXISTS 'XLSX';

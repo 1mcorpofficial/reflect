@@ -1,0 +1,66 @@
+P0-06: Privacy min-N konsekwentiskumas + UI paaiškinimas
+Proof log: 2026-01-11
+
+=== REPRODUCE ===
+
+1. Backend guards:
+   - Analytics route: privacyMode check (line 104) ✅
+   - Export route: privacyMode check (line 236) ✅
+   - Both return 403 with minCount + currentCount ✅
+
+2. Frontend UI:
+   - PrivacyGuardMessage component exists ✅
+   - Dashboard buildPrivacyMessage extracts minCount + currentCount ✅
+   - Dashboard displays PrivacyGuardMessage on 403 ✅
+
+=== FIXES APPLIED ===
+
+1. Analytics route:
+   - Added `privacyMode: true` to activity select (line 34)
+   - Enhanced error response with `minCount` and `currentCount` (line 109-110)
+
+2. Export route:
+   - Enhanced error response with `minCount` and `currentCount` (line 239-240)
+
+3. Dashboard:
+   - Enhanced buildPrivacyMessage to extract `currentCount` from response (line 141-142)
+
+=== ACCEPTANCE CHECK ===
+
+Expected behavior:
+- anon <5 responses -> 403 + UI shows privacy notice with minCount (5) and currentCount
+- anon >=5 responses -> 200 + analytics/export data shown
+
+Runtime proof pending (requires server + test data):
+- Need to create activity with ANONYMOUS privacyMode
+- Need to submit <5 responses
+- Need to verify 403 response with minCount/currentCount
+- Need to verify UI shows PrivacyGuardMessage with correct counts
+- Need to submit >=5 responses
+- Need to verify 200 response and data display
+
+=== CODE CHANGES ===
+
+1. src/app/api/activities/[activityId]/analytics/route.ts:
+   - Line 34: Added `privacyMode: true` to activity select
+   - Lines 107-110: Enhanced error response with `minCount` and `currentCount`
+
+2. src/app/api/activities/[activityId]/export/route.ts:
+   - Lines 237-240: Enhanced error response with `minCount` and `currentCount`
+
+3. src/app/dashboard/page.tsx:
+   - Lines 137-146: Enhanced buildPrivacyMessage to extract `currentCount`
+
+=== STATUS ===
+
+Backend guards: ✅ DONE
+Frontend UI: ✅ DONE
+Error responses: ✅ DONE (minCount + currentCount)
+Runtime proof: ⏳ PENDING (requires server + test scenario)
+
+NOTE: Runtime proof requires:
+1. Dev server running (npm run dev)
+2. Test facilitator login
+3. Create activity with ANONYMOUS privacyMode
+4. Submit <5 responses (test 403 + UI)
+5. Submit >=5 responses (test 200 + data)

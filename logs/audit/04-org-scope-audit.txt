@@ -1,0 +1,28 @@
+reflectus-app/src/app/api/activities/route.ts:88:    select: { id: true, name: true, createdById: true, orgId: true },
+reflectus-app/src/app/api/activities/route.ts:95:  if (auth.session.orgId && group.orgId !== auth.session.orgId) {
+reflectus-app/src/app/api/activities/[activityId]/export/route.ts:82:      group: { select: { orgId: true } },
+reflectus-app/src/app/api/activities/[activityId]/export/route.ts:95:  if (auth.session.orgId && activity.group.orgId !== auth.session.orgId) {
+reflectus-app/src/app/api/activities/[activityId]/analytics/route.ts:32:      group: { select: { orgId: true } },
+reflectus-app/src/app/api/activities/[activityId]/analytics/route.ts:54:  if (auth.session.orgId && activity.group.orgId !== auth.session.orgId) {
+reflectus-app/src/app/api/activities/[activityId]/status/route.ts:40:    select: { id: true, createdById: true, group: { select: { orgId: true } } },
+reflectus-app/src/app/api/activities/[activityId]/status/route.ts:46:  if (auth.session.orgId && activity.group.orgId !== auth.session.orgId) {
+reflectus-app/src/app/api/auth/register/route.ts:42:      orgId: org.id,
+reflectus-app/src/app/api/auth/register/route.ts:48:    select: { orgId: true, role: true },
+reflectus-app/src/app/api/auth/register/route.ts:111:    orgId: membership.orgId,
+reflectus-app/src/app/api/groups/route.ts:26:  if (!auth.session.orgId) {
+reflectus-app/src/app/api/groups/route.ts:55:      orgId: auth.session.orgId,
+reflectus-app/src/app/api/groups/route.ts:81:    where: { orgId: auth.session.orgId ?? undefined },
+reflectus-app/src/app/api/auth/login/route.ts:16:    select: { orgId: true, role: true, org: { select: { id: true, name: true, slug: true } } },
+reflectus-app/src/app/api/auth/login/route.ts:42:      orgId: org.id,
+reflectus-app/src/app/api/auth/login/route.ts:48:    select: { orgId: true, role: true },
+reflectus-app/src/app/api/auth/login/route.ts:102:    orgId: membership.orgId,
+reflectus-app/src/app/api/groups/[groupId]/activities/route.ts:15:    select: { id: true, createdById: true, orgId: true },
+reflectus-app/src/app/api/groups/[groupId]/activities/route.ts:20:  if (auth.session.orgId && group.orgId !== auth.session.orgId) {
+reflectus-app/src/app/api/groups/[groupId]/participants/route.ts:15:    select: { id: true, createdById: true, orgId: true },
+reflectus-app/src/app/api/groups/[groupId]/participants/route.ts:21:  if (auth.session.orgId && group.orgId !== auth.session.orgId) {
+reflectus-app/src/app/api/auth/me/route.ts:29:  const membership = session.orgId
+reflectus-app/src/app/api/auth/me/route.ts:31:        where: { orgId_userId: { orgId: session.orgId, userId: session.sub } },
+reflectus-app/src/app/api/groups/[groupId]/participants/import/route.ts:74:    select: { id: true, orgId: true, name: true, code: true },
+reflectus-app/src/app/api/groups/[groupId]/participants/import/route.ts:81:  if (auth.session.orgId && group.orgId !== auth.session.orgId) {
+reflectus-app/src/app/api/orgs/route.ts:71:      orgId: org.id,
+reflectus-app/src/app/api/orgs/route.ts:84:    orgId: org.id,

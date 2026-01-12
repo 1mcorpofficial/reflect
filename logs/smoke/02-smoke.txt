@@ -1,0 +1,3 @@
+Using BASE=http://localhost:3000
+--- facilitator login ---
+curl: (7) Failed to connect to localhost port 3000 after 0 ms: Connection refused

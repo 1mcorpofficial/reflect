@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: reflectus
+    ports:
+      - "5432:5432"
+    volumes:
+      - reflectus-db-data:/var/lib/postgresql/data
+volumes:
+  reflectus-db-data:
+

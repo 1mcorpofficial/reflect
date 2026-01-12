@@ -1,0 +1,7 @@
+Started dev server pid=120779
+Dev server ready
+{"user":{"id":"265dac0f-38c9-427e-a693-c6a597ea89e6","email":"demo@reflectus.local","name":"Demo Facilitator"},"org":{"id":"default-org","name":"Default Organization","slug":"default-org"}}
+{"user":{"id":"98e2b3ff-b763-4293-ad25-09b2005a93a5","email":"gdpr-test-1768141155@example.com","name":"GDPR Test","createdAt":"2026-01-11T14:19:18.256Z"},"org":{"id":"d026a278-d648-4702-b66c-374df5bfdb52","name":"GDPR Test","slug":"gdpr-test"}}
+--- admin anonymize ---
+{"user":{"id":"98e2b3ff-b763-4293-ad25-09b2005a93a5","email":"deleted+98e2b3ff-b763-4293-ad25-09b2005a93a5@example.invalid","name":null}}
+GDPR anonymize check complete

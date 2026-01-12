@@ -1,0 +1,76 @@
+P1-01: Scheduling UI (openAt/closeAt/timezone) + status badges
+Proof log: 2026-01-11
+
+=== REPRODUCE ===
+
+1. Backend guards:
+   - Response submission route: openAt/closeAt checks (line 93-103) ✅
+   - Returns 403 with codes: ACTIVITY_NOT_OPEN, ACTIVITY_CLOSED ✅
+
+2. Participant activities list:
+   - API route: `/api/participants/activities` returns state ("OPEN", "PLANNED", "CLOSED") ✅
+   - Participant page: activities list shows state badges ✅
+   - Participant page: planned/closed activities disabled (line 373-374) ✅
+
+3. Participant page:
+   - ActivityStatusBadge component integrated (line 19, 431-438, 386-393) ✅
+   - Submit button disabled for PLANNED/CLOSED (line 490-492) ✅
+   - Submit button shows appropriate labels: "Dar neatidaryta", "Uždaryta" (line 496-500) ✅
+
+4. Facilitator page:
+   - getActivityState function (line 84-93) ✅
+   - ActivityStatusBadge integrated (line 703-708) ✅
+
+=== ACCEPTANCE CHECK ===
+
+Expected behavior:
+- planned (openAt > now): submit blocked + UI shows "Neatidaryta" + "atsidarys [date]"
+- closed (closeAt < now OR status=CLOSED): submit blocked + UI shows "Uždaryta" + "užsidarė [date]"
+- open (published + (openAt <= now OR null) + (closeAt >= now OR null)): submit OK
+
+=== CODE VERIFICATION ===
+
+1. Backend:
+   - src/app/api/activities/[activityId]/responses/route.ts:
+     - Line 93-103: openAt/closeAt guards with error codes ✅
+   
+   - src/app/api/participants/activities/route.ts:
+     - Line 62-75: state calculation (OPEN, PLANNED, CLOSED) ✅
+     - Line 28: includes openAt, closeAt, timezone in select ✅
+
+2. Frontend:
+   - src/app/participant/page.tsx:
+     - Line 19: ActivityStatusBadge imported ✅
+     - Line 55: Activity type includes state ✅
+     - Line 373-374: activities list disabled for PLANNED/CLOSED ✅
+     - Line 386-393: ActivityStatusBadge in activities list ✅
+     - Line 431-438: ActivityStatusBadge in activity header ✅
+     - Line 490-492: Submit button disabled for PLANNED/CLOSED ✅
+     - Line 496-500: Submit button labels for PLANNED/CLOSED ✅
+   
+   - src/app/facilitator/(protected)/[groupId]/page.tsx:
+     - Line 84-93: getActivityState function ✅
+     - Line 703-708: ActivityStatusBadge in activities list ✅
+
+   - src/components/ActivityStatusBadge.tsx:
+     - Component created with OPEN/PLANNED/CLOSED/DRAFT states ✅
+     - Shows appropriate icons and labels ✅
+     - Shows openAt/closeAt dates with timezone support ✅
+
+=== STATUS ===
+
+Backend guards: ✅ DONE
+Participant UI: ✅ DONE
+Facilitator UI: ✅ DONE
+Status badges: ✅ DONE
+Runtime proof: ⏳ PENDING (requires server + test scenario)
+
+NOTE: Runtime proof requires:
+1. Dev server running (npm run dev)
+2. Create 3 activities:
+   - planned: openAt in future
+   - open: openAt in past (or null), closeAt in future (or null), status=PUBLISHED
+   - closed: closeAt in past (or status=CLOSED)
+3. Test participant activities list (planned/closed disabled)
+4. Test submit endpoint (planned/closed -> 403 with codes)
+5. Test UI badges and labels

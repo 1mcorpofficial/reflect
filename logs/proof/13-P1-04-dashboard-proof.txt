@@ -1,0 +1,86 @@
+P1-04: Teacher dashboard usability
+Proof log: 2026-01-11
+
+=== REPRODUCE ===
+
+1. Completion display:
+   - Completion rate card (line 554-580) ✅
+   - Shows completion percentage (line 565) ✅
+   - Shows totalResponses / totalParticipants (line 568) ✅
+   - Shows "Neužpildė" count (line 571) ✅
+   - Shows progress bar (line 573-578) ✅
+
+2. "Kas nepildė" list:
+   - Pending list card (line 640-671) ✅
+   - "Atnaujinti sąrašą" button (line 648-654) ✅
+   - loadPending function (line 245-282) ✅
+   - Shows pending participants with displayName and email (line 658-669) ✅
+   - Privacy-aware: shows message for anonymous mode (line 247-250) ✅
+
+3. Export CTA:
+   - Export buttons (CSV, PDF, XLSX) (line 486-506) ✅
+   - handleExport function (line 362-398) ✅
+   - Shows export status (line 534) ✅
+   - Privacy guard for anonymous mode <5 responses (line 372-376) ✅
+
+4. Filters:
+   - Group filter (line 420-434) ✅
+   - Activity filter (line 435-449) ✅
+   - Status filter (line 450-462) ✅
+   - Date filters: fromDate, toDate (line 463-480) ✅
+   - Filtered activities based on statusFilter (line 132-135) ✅
+   - Analytics URL built with from/to params (line 148-164) ✅
+
+=== ACCEPTANCE CHECK ===
+
+Expected behavior:
+- completion visible: percentage, progress bar, "Neužpildė" count
+- "kas nepildė" list visible: button to refresh, shows participants (named mode)
+- export CTA works: CSV/PDF/XLSX buttons, downloads files
+- filters work: group/activity/status/date filters applied
+
+=== CODE VERIFICATION ===
+
+1. Completion:
+   - src/app/dashboard/page.tsx:
+     - Line 554-580: Completion rate card ✅
+     - Line 565: Percentage calculation ✅
+     - Line 568: Total responses/participants ✅
+     - Line 571: "Neužpildė" count ✅
+     - Line 573-578: Progress bar ✅
+
+2. Pending list:
+   - Line 640-671: Pending list card ✅
+   - Line 245-282: loadPending function ✅
+   - Line 648-654: Refresh button ✅
+   - Line 658-669: Participant list display ✅
+
+3. Export:
+   - Line 486-506: Export buttons (CSV, PDF, XLSX) ✅
+   - Line 362-398: handleExport function ✅
+   - Line 534: Export status display ✅
+   - Line 372-376: Privacy guard ✅
+
+4. Filters:
+   - Line 419-480: Filter UI (group, activity, status, date) ✅
+   - Line 132-135: filteredActivities useMemo ✅
+   - Line 148-164: buildAnalyticsUrl with from/to ✅
+   - Line 166-182: loadGroups function ✅
+   - Line 184-200: loadActivities function ✅
+
+=== STATUS ===
+
+Completion display: ✅ DONE
+Pending list: ✅ DONE
+Export CTA: ✅ DONE
+Filters: ✅ DONE
+Runtime proof: ⏳ PENDING (requires server + test scenario)
+
+NOTE: Runtime proof requires:
+1. Dev server running (npm run dev)
+2. Facilitator login
+3. Navigate to dashboard
+4. Verify completion rate displayed
+5. Click "Atnaujinti sąrašą" - verify pending list shows
+6. Test export buttons (CSV, PDF, XLSX) - verify downloads
+7. Test filters: select group, activity, status, dates - verify analytics update

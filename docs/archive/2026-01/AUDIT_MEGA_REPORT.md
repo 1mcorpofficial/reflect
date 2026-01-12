@@ -1,3 +1,6 @@
+ARCHIVED: replaced by `docs/STATUS.md` and `docs/audit/` files
+
+---
 # AUDIT MEGA REPORT - Reflectus Alternatyvė
 
 **Data:** 2026-01-12  

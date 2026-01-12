@@ -67,7 +67,39 @@ Enums:
 Models:
 - `User`, `Participant`, `Organization`, `OrgMember`, `Group`, `GroupParticipant`, `ParticipantInvite`, `Activity`, `Questionnaire`, `Question`, `Response`, `Answer`, `AnalyticsSnapshot`, `DataExport`, `AuditLog`
 
+## Folder Structure
+
+### Root Level
+- `README.md` - Project overview and quick start
+- `docker-compose.yml` - Local PostgreSQL setup
+- `env.example` - Environment variables template
+- Config files: `tsconfig.json`, `tailwind.config.ts`, `prisma.config.ts`, `next.config.ts`
+
+### Documentation (`docs/`)
+- `INDEX.md` - Documentation index/table of contents
+- `SETUP.md` - Development setup and runbook
+- `ARCHITECTURE.md` - This file (project structure and tech stack)
+- `STATUS.md` - Current project status (done/in progress/blockers)
+- `TODO.md` - Backlog with priorities
+- `TESTING.md` - Testing scenarios and instructions
+- `GDPR.md` - GDPR compliance baseline
+- `DECISIONS.md` - Technical decisions and trade-offs
+- `audit/` - Audit logs and proofs
+- `infra/` - Deployment and operations
+- `archive/` - Historical documents
+
+### Source Code (`src/`)
+- `app/` - Next.js App Router (pages and API routes)
+- `components/` - React UI components
+- `lib/` - Shared server utilities
+- `generated/prisma/` - Prisma client output
+
+### Database (`prisma/`)
+- `schema.prisma` - Database schema
+- `migrations/` - Migration history
+- `seed.ts` - Database seeding script
+
 ## Setup docs
 
-- Canonical runbook: `docs/audit/RUNBOOK_DEV.md`
-- Deprecated quick setup docs: `docs/setup/*`
+- Canonical runbook: `docs/SETUP.md`
+- Deprecated quick setup docs: `docs/setup/*` (archived)

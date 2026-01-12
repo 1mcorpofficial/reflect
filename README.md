@@ -189,6 +189,15 @@ npm run db:migrate
 npm run db:seed
 ```
 
+## Dokumentacija
+
+- **[docs/INDEX.md](docs/INDEX.md)** - Dokumentacijos žemėlapis
+- **[docs/STATUS.md](docs/STATUS.md)** - Projekto būsena (kas padaryta, kas daroma)
+- **[docs/TODO.md](docs/TODO.md)** - Backlog su prioritetais
+- **[docs/SETUP.md](docs/SETUP.md)** - Detalus setup ir dev runbook
+- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Projekto struktūra ir tech stack
+- **[docs/TESTING.md](docs/TESTING.md)** - Testavimo scenarijai
+
 ## Kitas žingsnis
 
 Kai viskas veikia, galite:

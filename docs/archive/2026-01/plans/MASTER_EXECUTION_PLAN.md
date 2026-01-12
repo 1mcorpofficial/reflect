@@ -1,3 +1,6 @@
+ARCHIVED: replaced by `docs/TODO.md` (backlog)
+
+---
 # MASTER EXECUTION PLAN - Reflectus Alternatyvė
 
 > Pastaba: kanoniniai statuso dokumentai perkelti į `docs/STATUS.md` ir `docs/REQUIREMENTS_STATUS.md`. Nuorodos į `docs/STATUS.md` ar `docs/REQUIREMENTS_STATUS.md` šiame faile yra istorinės.

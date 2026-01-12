@@ -1,3 +1,6 @@
+ARCHIVED: replaced by `docs/TODO.md` (backlog)
+
+---
 # RETHINK_NOTES
 
 Pasitikrinimas prieš hardening:

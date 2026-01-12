@@ -1,3 +1,6 @@
+ARCHIVED: replaced by `docs/TODO.md` (backlog)
+
+---
 # MASTER_BACKLOG
 
 Legend: Status = TODO / IN_PROGRESS / DONE. Evidence = log/command/manual.

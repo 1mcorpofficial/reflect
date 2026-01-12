@@ -1,3 +1,6 @@
+ARCHIVED: replaced by `docs/TODO.md` (backlog)
+
+---
 # PLAN_MVP (MVP 5.0 → Fix Pack → 5.1 → 5.2)
 
 Format: Tikslas • Kur keisti • Užduočių checklist • Priklausomybės • DoD • Rizikos

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { logAudit } from "@/lib/audit";
 import { requireRole } from "@/lib/guards";
+import { requireWorkspaceRole, validateResourceWorkspace } from "@/lib/tenancy";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { buildRateLimitKey, checkRateLimit } from "@/lib/rate-limit";
@@ -62,8 +63,12 @@ const activitySchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const auth = await requireRole(req, "facilitator");
+  const auth = await requireRole(req, "facilitator", { requireOrg: false });
   if (!auth.ok) return auth.response;
+
+  // Resolve workspace context and enforce role
+  const workspace = await requireWorkspaceRole(req, ["ORG_ADMIN", "STAFF", "OWNER"]);
+  if (!workspace.ok) return workspace.response;
 
   const limiterKey = buildRateLimitKey(req, "activity-create");
   const allowed = checkRateLimit(limiterKey, 10, 60_000);
@@ -85,15 +90,22 @@ export async function POST(req: Request) {
 
   const group = await prisma.group.findUnique({
     where: { id: parsed.data.groupId },
-    select: { id: true, name: true, createdById: true, orgId: true },
+    select: { id: true, name: true, createdById: true, orgId: true, workspaceId: true },
   });
 
   if (!group) {
     return NextResponse.json({ error: "Group not found" }, { status: 404 });
   }
 
-  if (auth.session.orgId && group.orgId !== auth.session.orgId) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  // Validate that group belongs to workspace
+  const belongsToWorkspace = await validateResourceWorkspace(
+    parsed.data.groupId,
+    "group",
+    workspace.context.workspaceId,
+  );
+
+  if (!belongsToWorkspace) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
   if (
@@ -126,6 +138,7 @@ export async function POST(req: Request) {
     const createdActivity = await tx.activity.create({
       data: {
         groupId: parsed.data.groupId,
+        workspaceId: workspace.context.workspaceId, // Set workspace_id
         title: parsed.data.title.trim(),
         description: parsed.data.description,
         privacyMode: parsed.data.privacyMode,
@@ -135,7 +148,7 @@ export async function POST(req: Request) {
         scheduledFor: parsed.data.scheduledFor
           ? new Date(parsed.data.scheduledFor)
           : null,
-        createdById: auth.session.sub,
+        createdById: workspace.session.sub,
         status: "DRAFT",
       },
       select: { id: true },
@@ -167,7 +180,9 @@ export async function POST(req: Request) {
     action: "activity.create",
     targetType: "Activity",
     targetId: activity.activityId,
-    actorUserId: auth.session.sub,
+    actorUserId: workspace.session.sub,
+    workspaceId: workspace.context.workspaceId,
+    metadata: { workspaceId: workspace.context.workspaceId },
   });
 
   return NextResponse.json(

@@ -8,8 +8,10 @@ export type SessionPayload = {
   role: SessionRole;
   groupId?: string;
   membershipId?: string;
-  orgId?: string;
-  orgRole?: "ORG_ADMIN" | "FACILITATOR";
+  orgId?: string; // DEPRECATED: Use activeWorkspaceId instead
+  orgRole?: "ORG_ADMIN" | "FACILITATOR"; // DEPRECATED: Use workspaceRole instead
+  activeWorkspaceId?: string; // New: Active workspace ID
+  workspaceRole?: "ORG_ADMIN" | "STAFF" | "PARTICIPANT" | "OWNER" | "MEMBER"; // New: Role in active workspace
 };
 
 export const SESSION_COOKIE = "reflectus_session";
@@ -52,8 +54,16 @@ export function verifySession(token: string): SessionPayload | null {
       role: decoded.role as SessionRole,
       groupId: decoded.groupId as string | undefined,
       membershipId: decoded.membershipId as string | undefined,
-      orgId: decoded.orgId as string | undefined,
-      orgRole: decoded.orgRole as "ORG_ADMIN" | "FACILITATOR" | undefined,
+      orgId: decoded.orgId as string | undefined, // Backward compatibility
+      orgRole: decoded.orgRole as "ORG_ADMIN" | "FACILITATOR" | undefined, // Backward compatibility
+      activeWorkspaceId: decoded.activeWorkspaceId as string | undefined,
+      workspaceRole: decoded.workspaceRole as
+        | "ORG_ADMIN"
+        | "STAFF"
+        | "PARTICIPANT"
+        | "OWNER"
+        | "MEMBER"
+        | undefined,
     };
   } catch {
     return null;

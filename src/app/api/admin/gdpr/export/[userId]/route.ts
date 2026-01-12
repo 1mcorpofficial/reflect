@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { getRequestId, createErrorResponse } from "@/lib/error-handler";
+import crypto from "crypto";
 
 /**
  * GET /api/admin/gdpr/export/[userId]
@@ -36,20 +37,81 @@ export async function GET(
       );
     }
 
-    // Get user's activities
+    // #region agent log
+    const requestId = crypto.randomUUID();
+    fetch('http://127.0.0.1:7242/ingest/dcad8cdf-9cd2-450e-a34c-02d9135e8f5f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin/gdpr/export/[userId]/route.ts:39',message:'admin gdpr export query start',data:{requestId,adminUserId:auth.session.sub,targetUserId:userId},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'H3'})}).catch(()=>{});
+    // #endregion
+
+    // Get admin's workspace memberships to filter data
+    const adminMemberships = await prisma.workspaceMembership.findMany({
+      where: {
+        userId: auth.session.sub,
+        status: "ACTIVE",
+      },
+      select: { workspaceId: true },
+    });
+    const adminWorkspaceIds = adminMemberships.map((m) => m.workspaceId);
+
+    // Enforce workspace isolation: admin must have workspace memberships
+    if (adminWorkspaceIds.length === 0) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/dcad8cdf-9cd2-450e-a34c-02d9135e8f5f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin/gdpr/export/[userId]/route.ts:55',message:'admin gdpr export no workspace access',data:{requestId,adminWorkspaceIds:[],decision:'DENY'},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'H3'})}).catch(()=>{});
+      // #endregion
+      return NextResponse.json(
+        { error: "No workspace access" },
+        { status: 403 },
+      );
+    }
+
+    // Check if target user is in any of admin's workspaces
+    const userMemberships = await prisma.workspaceMembership.findMany({
+      where: {
+        userId,
+        workspaceId: { in: adminWorkspaceIds },
+        status: "ACTIVE",
+      },
+      select: { workspaceId: true },
+    });
+
+    if (userMemberships.length === 0) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/dcad8cdf-9cd2-450e-a34c-02d9135e8f5f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin/gdpr/export/[userId]/route.ts:55',message:'admin gdpr export access denied',data:{requestId,adminWorkspaceIds,userMemberships:[],decision:'DENY'},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'H3'})}).catch(()=>{});
+      // #endregion
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 },
+      );
+    }
+
+    // Get user's activities - filter by admin's workspaces (adminWorkspaceIds.length > 0 guaranteed)
     const activities = await prisma.activity.findMany({
-      where: { createdById: userId },
+      where: {
+        createdById: userId,
+        OR: [
+          { workspaceId: { in: adminWorkspaceIds } },
+          { workspaceId: null, group: { workspaceId: { in: adminWorkspaceIds } } },
+          { workspaceId: null, group: { orgId: { in: adminWorkspaceIds } } },
+        ],
+      },
       select: {
         id: true,
         title: true,
         createdAt: true,
         status: true,
+        workspaceId: true,
       },
     });
 
-    // Get user's org memberships
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/dcad8cdf-9cd2-450e-a34c-02d9135e8f5f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin/gdpr/export/[userId]/route.ts:75',message:'admin gdpr export activities result',data:{requestId,activitiesCount:activities.length,workspaceIds:activities.map(a=>a.workspaceId).filter(Boolean),hasWorkspaceFilter:true,decision:'ALLOW'},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'H3'})}).catch(()=>{});
+    // #endregion
+
+    // Get user's org memberships - filter by admin's workspaces (adminWorkspaceIds.length > 0 guaranteed)
     const memberships = await prisma.orgMember.findMany({
-      where: { userId },
+      where: {
+        userId,
+        orgId: { in: adminWorkspaceIds },
+      },
       select: {
         org: {
           select: {
@@ -64,16 +126,27 @@ export async function GET(
       },
     });
 
-    // Get user's groups (as facilitator)
+    // Get user's groups (as facilitator) - filter by admin's workspaces (adminWorkspaceIds.length > 0 guaranteed)
     const groups = await prisma.group.findMany({
-      where: { createdById: userId },
+      where: {
+        createdById: userId,
+        OR: [
+          { workspaceId: { in: adminWorkspaceIds } },
+          { workspaceId: null, orgId: { in: adminWorkspaceIds } },
+        ],
+      },
       select: {
         id: true,
         name: true,
         code: true,
         createdAt: true,
+        workspaceId: true,
       },
     });
+
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/dcad8cdf-9cd2-450e-a34c-02d9135e8f5f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin/gdpr/export/[userId]/route.ts:110',message:'admin gdpr export groups result',data:{requestId,groupsCount:groups.length,workspaceIds:groups.map(g=>g.workspaceId).filter(Boolean),hasWorkspaceFilter:true,decision:'ALLOW'},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'H3'})}).catch(()=>{});
+    // #endregion
 
     const exportData = {
       user: {

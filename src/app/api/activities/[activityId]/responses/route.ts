@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { logAudit } from "@/lib/audit";
 import { requireRole } from "@/lib/guards";
+import { requireWorkspaceRole, validateResourceWorkspace } from "@/lib/tenancy";
 import { prisma } from "@/lib/prisma";
 import { buildRateLimitKey, checkRateLimit } from "@/lib/rate-limit";
 import { hmacLookup } from "@/lib/hmac";
@@ -61,10 +62,17 @@ export async function POST(
     select: {
       id: true,
       groupId: true,
+      workspaceId: true,
       privacyMode: true,
       status: true,
       openAt: true,
       closeAt: true,
+      group: {
+        select: {
+          workspaceId: true,
+          orgId: true,
+        },
+      },
       questionnaire: {
         select: {
           questions: {
@@ -85,8 +93,37 @@ export async function POST(
     return NextResponse.json({ error: "Activity not found" }, { status: 404 });
   }
 
-  if (auth.session.groupId && activity.groupId !== auth.session.groupId) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  // Validate workspace ownership
+  const activityWorkspaceId = activity.workspaceId || activity.group?.workspaceId;
+  const activityOrgId = activity.group?.orgId;
+  
+  if (!activityWorkspaceId && !activityOrgId) {
+    return NextResponse.json({ error: "Activity not found" }, { status: 404 });
+  }
+
+  // Validate participant's group belongs to same workspace
+  if (auth.session.groupId) {
+    if (activity.groupId !== auth.session.groupId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Additional workspace validation
+    const participantGroup = await prisma.group.findUnique({
+      where: { id: auth.session.groupId },
+      select: { workspaceId: true, orgId: true },
+    });
+
+    if (!participantGroup) {
+      return NextResponse.json({ error: "Group not found" }, { status: 404 });
+    }
+
+    // Check workspace match (support backward compatibility)
+    const participantWorkspaceId = participantGroup.workspaceId || participantGroup.orgId;
+    const targetWorkspaceId = activityWorkspaceId || activityOrgId;
+
+    if (participantWorkspaceId !== targetWorkspaceId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
   }
 
   const now = new Date();
@@ -318,11 +355,18 @@ export async function POST(
     `${activity.id}:${auth.session.membershipId ?? "anon"}`,
   );
 
+  // Get workspaceId from activity or group (use already validated values)
+  const responseWorkspaceId =
+    activityWorkspaceId ??
+    activityOrgId ??
+    null;
+
   const response = await prisma.$transaction(async (tx) => {
     const createdResponse = await tx.response.create({
       data: {
         activityId: activity.id,
         groupId: activity.groupId,
+        workspaceId: responseWorkspaceId, // Set workspace_id
         participantId:
           activity.privacyMode === "ANONYMOUS" ? null : auth.session.sub,
         groupParticipantId:
@@ -362,6 +406,7 @@ export async function POST(
     targetType: "Activity",
     targetId: activity.id,
     actorParticipantId: auth.session.membershipId ?? null,
+    workspaceId: responseWorkspaceId,
   });
 
   return NextResponse.json({ responseId: response.id }, { status: 201 });
@@ -371,16 +416,28 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ activityId: string }> },
 ) {
-  const auth = await requireRole(req, "facilitator");
+  const auth = await requireRole(req, "facilitator", { requireOrg: false });
   if (!auth.ok) return auth.response;
 
+  const workspace = await requireWorkspaceRole(req, ["ORG_ADMIN", "STAFF", "OWNER"]);
+  if (!workspace.ok) return workspace.response;
+
   const { activityId } = await params;
+
+  const belongsToWorkspace = await validateResourceWorkspace(
+    activityId,
+    "activity",
+    workspace.context.workspaceId,
+  );
+  if (!belongsToWorkspace) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
   const activity = await prisma.activity.findUnique({
     where: { id: activityId },
     select: {
       id: true,
       privacyMode: true,
-      group: { select: { orgId: true } },
       questionnaire: {
         select: {
           questions: { select: { id: true, prompt: true, order: true } },
@@ -391,9 +448,6 @@ export async function GET(
 
   if (!activity) {
     return NextResponse.json({ error: "Activity not found" }, { status: 404 });
-  }
-  if (auth.session.orgId && activity.group.orgId !== auth.session.orgId) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const responses = await prisma.response.findMany({

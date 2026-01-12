@@ -4,6 +4,7 @@ import { logAudit } from "@/lib/audit";
 import { generatePersonalCode } from "@/lib/codes";
 import { requireRole } from "@/lib/guards";
 import { hashSecret } from "@/lib/auth";
+import { requireWorkspaceRole, validateResourceWorkspace } from "@/lib/tenancy";
 import { prisma } from "@/lib/prisma";
 import { hmacLookup } from "@/lib/hmac";
 import { buildRateLimitKey, checkRateLimit } from "@/lib/rate-limit";
@@ -47,8 +48,11 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ groupId: string }> },
 ) {
-  const auth = await requireRole(req, "facilitator");
+  const auth = await requireRole(req, "facilitator", { requireOrg: false });
   if (!auth.ok) return auth.response;
+
+  const workspace = await requireWorkspaceRole(req, ["ORG_ADMIN", "STAFF", "OWNER"]);
+  if (!workspace.ok) return workspace.response;
 
   const limiterKey = buildRateLimitKey(req, "participant-import");
   const allowed = checkRateLimit(limiterKey, 5, 60_000);
@@ -71,15 +75,16 @@ export async function POST(
 
   const group = await prisma.group.findUnique({
     where: { id: groupId },
-    select: { id: true, orgId: true, name: true, code: true },
+    select: { id: true, name: true, code: true },
   });
 
-  if (!group) {
+  const belongsToWorkspace = await validateResourceWorkspace(
+    groupId,
+    "group",
+    workspace.context.workspaceId,
+  );
+  if (!group || !belongsToWorkspace) {
     return NextResponse.json({ error: "Group not found" }, { status: 404 });
-  }
-
-  if (auth.session.orgId && group.orgId !== auth.session.orgId) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const participantInputs: ParticipantInput[] =
@@ -162,7 +167,8 @@ export async function POST(
     targetType: "Group",
     targetId: group.id,
     actorUserId: auth.session.sub,
-    metadata: { count: created.length },
+    workspaceId: workspace.context.workspaceId,
+    metadata: { count: created.length, workspaceId: workspace.context.workspaceId },
   });
 
   return NextResponse.json(

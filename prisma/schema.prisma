@@ -1,6 +1,6 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
   previewFeatures = []
 }
 
@@ -18,9 +18,23 @@ enum OrgRole {
   FACILITATOR
 }
 
+enum WorkspaceType {
+  ORGANIZATION
+  PERSONAL
+}
+
+enum WorkspaceRole {
+  ORG_ADMIN
+  STAFF
+  PARTICIPANT
+  OWNER
+  MEMBER
+}
+
 enum MemberStatus {
   INVITED
   ACTIVE
+  DISABLED
 }
 
 enum ActivityStatus {
@@ -60,75 +74,146 @@ enum AnswerStatus {
 }
 
 model User {
-  id           String              @id @default(uuid())
-  email        String              @unique
+  id           String   @id @default(uuid())
+  email        String   @unique
   passwordHash String
   name         String?
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  groups       Group[]             @relation("UserGroups")
-  activities   Activity[]          @relation("ActivityCreatedBy")
-  invites      ParticipantInvite[]
-  auditLogs    AuditLog[]          @relation("UserAudit")
-  exports      DataExport[]        @relation("ExportsCreated")
-  orgMemberships OrgMember[]
-  organizationsCreated Organization[] @relation("OrgCreatedBy")
+  groups                  Group[]               @relation("UserGroups")
+  activities              Activity[]            @relation("ActivityCreatedBy")
+  invites                 ParticipantInvite[]
+  auditLogs               AuditLog[]            @relation("UserAudit")
+  exports                 DataExport[]          @relation("ExportsCreated")
+  orgMemberships          OrgMember[]
+  organizationsCreated    Organization[]        @relation("OrgCreatedBy")
+  workspaceMemberships    WorkspaceMembership[]
+  workspacesCreated       Workspace[]           @relation("WorkspaceCreatedBy")
+  workspaceInvitesCreated WorkspaceInvite[]     @relation("InviteCreatedBy")
 }
 
 model Participant {
-  id          String              @id @default(uuid())
+  id          String   @id @default(uuid())
   displayName String
   email       String?
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   memberships GroupParticipant[]
   responses   Response[]
   invites     ParticipantInvite[]
 }
 
+// DEPRECATED: Use Workspace model instead. Kept for backward compatibility during migration.
 model Organization {
-  id        String      @id @default(uuid())
-  name      String
-  slug      String      @unique
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
   createdById String?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   createdBy User?       @relation("OrgCreatedBy", fields: [createdById], references: [id])
   members   OrgMember[]
   groups    Group[]
 }
 
+model Workspace {
+  id          String        @id @default(uuid())
+  type        WorkspaceType
+  name        String
+  slug        String?       @unique
+  createdById String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Optional fields for organization workspaces
+  billingStatus   String?
+  plan            String?
+  companyCode     String?
+  domainAllowlist String?
+
+  createdBy   User?                 @relation("WorkspaceCreatedBy", fields: [createdById], references: [id])
+  memberships WorkspaceMembership[]
+  groups      Group[]
+  invites     WorkspaceInvite[]
+
+  @@index([type])
+  @@index([slug])
+}
+
+// DEPRECATED: Use WorkspaceMembership model instead. Kept for backward compatibility during migration.
 model OrgMember {
-  id          String      @id @default(uuid())
+  id          String       @id @default(uuid())
   orgId       String
   userId      String
   role        OrgRole
   status      MemberStatus @default(INVITED)
-  invitedAt   DateTime    @default(now())
+  invitedAt   DateTime     @default(now())
   activatedAt DateTime?
 
-  org         Organization @relation(fields: [orgId], references: [id])
-  user        User         @relation(fields: [userId], references: [id])
+  org  Organization @relation(fields: [orgId], references: [id])
+  user User         @relation(fields: [userId], references: [id])
 
   @@unique([orgId, userId])
   @@index([orgId])
 }
 
-model Group {
-  id           String               @id @default(uuid())
-  orgId        String
-  name         String
-  code         String               @unique
-  description  String?
-  createdById  String?
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
+model WorkspaceMembership {
+  id          String        @id @default(uuid())
+  workspaceId String
+  userId      String
+  role        WorkspaceRole
+  status      MemberStatus  @default(INVITED)
+  invitedAt   DateTime      @default(now())
+  activatedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
-  createdBy    User?                @relation("UserGroups", fields: [createdById], references: [id])
-  organization Organization         @relation(fields: [orgId], references: [id])
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@unique([workspaceId, userId])
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([workspaceId, status])
+}
+
+model WorkspaceInvite {
+  id           String        @id @default(uuid())
+  workspaceId  String
+  email        String
+  intendedRole WorkspaceRole
+  tokenHash    String        @unique
+  expiresAt    DateTime
+  acceptedAt   DateTime?
+  createdById  String?
+  createdAt    DateTime      @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  createdBy User?     @relation("InviteCreatedBy", fields: [createdById], references: [id])
+
+  @@index([workspaceId])
+  @@index([email])
+  @@index([tokenHash])
+  @@index([expiresAt])
+}
+
+model Group {
+  id          String   @id @default(uuid())
+  orgId       String // DEPRECATED: Use workspaceId. Kept for backward compatibility.
+  workspaceId String? // New field for workspace scoping
+  name        String
+  code        String   @unique
+  description String?
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdBy    User?               @relation("UserGroups", fields: [createdById], references: [id])
+  organization Organization?       @relation(fields: [orgId], references: [id])
+  workspace    Workspace?          @relation(fields: [workspaceId], references: [id])
   participants GroupParticipant[]
   activities   Activity[]
   invites      ParticipantInvite[]
@@ -136,20 +221,21 @@ model Group {
   exports      DataExport[]
 
   @@index([orgId])
+  @@index([workspaceId])
 }
 
 model GroupParticipant {
-  id               String          @id @default(uuid())
-  groupId          String
-  participantId    String
-  personalCodeHash String
-  personalCodeLookup String        @unique
-  joinedAt         DateTime        @default(now())
+  id                 String   @id @default(uuid())
+  groupId            String
+  participantId      String
+  personalCodeHash   String
+  personalCodeLookup String   @unique
+  joinedAt           DateTime @default(now())
 
-  group            Group           @relation(fields: [groupId], references: [id])
-  participant      Participant     @relation(fields: [participantId], references: [id])
-  responses        Response[]
-  auditLogs        AuditLog[]      @relation("ParticipantAudit")
+  group       Group       @relation(fields: [groupId], references: [id])
+  participant Participant @relation(fields: [participantId], references: [id])
+  responses   Response[]
+  auditLogs   AuditLog[]  @relation("ParticipantAudit")
 
   @@unique([groupId, participantId])
   @@index([groupId])
@@ -157,7 +243,7 @@ model GroupParticipant {
 }
 
 model ParticipantInvite {
-  id            String      @id @default(uuid())
+  id            String    @id @default(uuid())
   groupId       String
   displayName   String
   email         String?
@@ -166,98 +252,102 @@ model ParticipantInvite {
   participantId String?
   expiresAt     DateTime?
   redeemedAt    DateTime?
-  createdAt     DateTime    @default(now())
+  createdAt     DateTime  @default(now())
 
-  group         Group       @relation(fields: [groupId], references: [id])
-  createdBy     User?       @relation(fields: [createdById], references: [id])
-  participant   Participant? @relation(fields: [participantId], references: [id])
+  group       Group        @relation(fields: [groupId], references: [id])
+  createdBy   User?        @relation(fields: [createdById], references: [id])
+  participant Participant? @relation(fields: [participantId], references: [id])
 
   @@index([groupId])
 }
 
 model Activity {
-  id             String          @id @default(uuid())
-  groupId        String
-  createdById    String?
-  title          String
-  description    String?
-  privacyMode    PrivacyMode
-  status         ActivityStatus  @default(DRAFT)
-  openAt         DateTime?
-  closeAt        DateTime?
-  timezone       String?
-  scheduledFor   DateTime?
-  publishedAt    DateTime?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id           String         @id @default(uuid())
+  groupId      String
+  workspaceId  String? // New field for direct workspace scoping
+  createdById  String?
+  title        String
+  description  String?
+  privacyMode  PrivacyMode
+  status       ActivityStatus @default(DRAFT)
+  openAt       DateTime?
+  closeAt      DateTime?
+  timezone     String?
+  scheduledFor DateTime?
+  publishedAt  DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
-  group          Group           @relation(fields: [groupId], references: [id])
-  createdBy      User?           @relation("ActivityCreatedBy", fields: [createdById], references: [id])
-  questionnaire  Questionnaire?
-  responses      Response[]
-  exports        DataExport[]
-  analytics      AnalyticsSnapshot[]
+  group         Group               @relation(fields: [groupId], references: [id])
+  createdBy     User?               @relation("ActivityCreatedBy", fields: [createdById], references: [id])
+  questionnaire Questionnaire?
+  responses     Response[]
+  exports       DataExport[]
+  analytics     AnalyticsSnapshot[]
 
   @@index([groupId, status])
+  @@index([workspaceId])
   @@index([openAt])
   @@index([closeAt])
 }
 
 model Questionnaire {
-  id          String      @id @default(uuid())
-  activityId  String      @unique
-  title       String?
-  createdAt   DateTime    @default(now())
+  id         String   @id @default(uuid())
+  activityId String   @unique
+  title      String?
+  createdAt  DateTime @default(now())
 
-  activity    Activity    @relation(fields: [activityId], references: [id])
-  questions   Question[]
+  activity  Activity   @relation(fields: [activityId], references: [id])
+  questions Question[]
 }
 
 model Question {
-  id               String       @id @default(uuid())
-  questionnaireId  String
-  prompt           String
-  helperText       String?
-  type             QuestionType
-  order            Int
-  config           Json?
-  followUp         Json?
-  required         Boolean      @default(true)
-  createdAt        DateTime     @default(now())
+  id              String       @id @default(uuid())
+  questionnaireId String
+  prompt          String
+  helperText      String?
+  type            QuestionType
+  order           Int
+  config          Json?
+  followUp        Json?
+  required        Boolean      @default(true)
+  createdAt       DateTime     @default(now())
 
-  questionnaire    Questionnaire @relation(fields: [questionnaireId], references: [id])
-  answers          Answer[]
+  questionnaire Questionnaire @relation(fields: [questionnaireId], references: [id])
+  answers       Answer[]
 
   @@index([questionnaireId, order])
 }
 
 model Response {
-  id                  String           @id @default(uuid())
-  activityId          String
-  groupId             String
-  groupParticipantId  String?
-  participantId       String?
-  isAnonymous         Boolean          @default(false)
-  submissionKey       String?          @unique
-  submittedAt         DateTime?
-  createdAt           DateTime         @default(now())
-  updatedAt           DateTime         @updatedAt
+  id                 String    @id @default(uuid())
+  activityId         String
+  groupId            String
+  workspaceId        String? // New field for direct workspace scoping
+  groupParticipantId String?
+  participantId      String?
+  isAnonymous        Boolean   @default(false)
+  submissionKey      String?   @unique
+  submittedAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
-  activity            Activity         @relation(fields: [activityId], references: [id])
-  group               Group            @relation(fields: [groupId], references: [id])
-  groupParticipant    GroupParticipant? @relation(fields: [groupParticipantId], references: [id])
-  participant         Participant?     @relation(fields: [participantId], references: [id])
-  answers             Answer[]
+  activity         Activity          @relation(fields: [activityId], references: [id])
+  group            Group             @relation(fields: [groupId], references: [id])
+  groupParticipant GroupParticipant? @relation(fields: [groupParticipantId], references: [id])
+  participant      Participant?      @relation(fields: [participantId], references: [id])
+  answers          Answer[]
 
-  @@index([activityId])
-  @@index([participantId])
-  @@index([groupParticipantId])
   @@unique([activityId, participantId])
   @@unique([activityId, groupParticipantId])
+  @@index([activityId])
+  @@index([workspaceId])
+  @@index([participantId])
+  @@index([groupParticipantId])
 }
 
 model Answer {
-  id          String    @id @default(uuid())
+  id          String       @id @default(uuid())
   responseId  String
   questionId  String
   value       Json?
@@ -265,10 +355,10 @@ model Answer {
   numberValue Float?
   status      AnswerStatus @default(ANSWERED)
   meta        Json?
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime     @default(now())
 
-  response    Response  @relation(fields: [responseId], references: [id])
-  question    Question  @relation(fields: [questionId], references: [id])
+  response Response @relation(fields: [responseId], references: [id])
+  question Question @relation(fields: [questionId], references: [id])
 
   @@unique([responseId, questionId])
 }
@@ -282,43 +372,47 @@ model AnalyticsSnapshot {
   to         DateTime?
   payload    Json
 
-  activity   Activity  @relation(fields: [activityId], references: [id])
+  activity Activity @relation(fields: [activityId], references: [id])
 
   @@index([activityId, computedAt])
 }
 
 model DataExport {
-  id           String         @id @default(uuid())
+  id           String       @id @default(uuid())
   groupId      String?
   activityId   String?
+  workspaceId  String? // New field for workspace scoping
   createdById  String?
   format       ExportFormat
-  status       ExportStatus   @default(PENDING)
+  status       ExportStatus @default(PENDING)
   location     String?
   errorMessage String?
-  createdAt    DateTime       @default(now())
+  createdAt    DateTime     @default(now())
   completedAt  DateTime?
 
-  group        Group?         @relation(fields: [groupId], references: [id])
-  activity     Activity?      @relation(fields: [activityId], references: [id])
-  createdBy    User?          @relation("ExportsCreated", fields: [createdById], references: [id])
+  group     Group?    @relation(fields: [groupId], references: [id])
+  activity  Activity? @relation(fields: [activityId], references: [id])
+  createdBy User?     @relation("ExportsCreated", fields: [createdById], references: [id])
 
   @@index([groupId])
   @@index([activityId])
+  @@index([workspaceId])
 }
 
 model AuditLog {
-  id                   String           @id @default(uuid())
-  action               String
-  targetType           String
-  targetId             String?
-  actorUserId          String?
-  actorParticipantId   String?
-  metadata             Json?
-  createdAt            DateTime         @default(now())
+  id                 String   @id @default(uuid())
+  action             String
+  targetType         String
+  targetId           String?
+  workspaceId        String? // New field for workspace scoping
+  actorUserId        String?
+  actorParticipantId String?
+  metadata           Json?
+  createdAt          DateTime @default(now())
 
-  actorUser            User?            @relation("UserAudit", fields: [actorUserId], references: [id])
-  actorParticipant     GroupParticipant? @relation("ParticipantAudit", fields: [actorParticipantId], references: [id])
+  actorUser        User?             @relation("UserAudit", fields: [actorUserId], references: [id])
+  actorParticipant GroupParticipant? @relation("ParticipantAudit", fields: [actorParticipantId], references: [id])
 
   @@index([action])
+  @@index([workspaceId])
 }

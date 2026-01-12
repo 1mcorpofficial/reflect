@@ -20,6 +20,54 @@ function slugify(input: string) {
     .slice(0, 40) || "org";
 }
 
+/**
+ * Creates a Personal Workspace for a new user.
+ * Each user gets exactly one Personal Workspace with OWNER role.
+ */
+async function createPersonalWorkspaceForUser(userId: string, baseName: string) {
+  const workspaceName = baseName || "Personal Workspace";
+
+  // Check if user already has a personal workspace (shouldn't happen, but safety check)
+  const existing = await prisma.workspaceMembership.findFirst({
+    where: {
+      userId,
+      workspace: { type: "PERSONAL" },
+    },
+    include: { workspace: true },
+  });
+
+  if (existing) {
+    return {
+      workspace: existing.workspace,
+      membership: existing,
+    };
+  }
+
+  const workspace = await prisma.workspace.create({
+    data: {
+      type: "PERSONAL",
+      name: workspaceName,
+      slug: null, // Personal workspaces don't need slugs
+      createdById: userId,
+    },
+    select: { id: true, name: true, type: true },
+  });
+
+  const membership = await prisma.workspaceMembership.create({
+    data: {
+      workspaceId: workspace.id,
+      userId,
+      role: "OWNER",
+      status: "ACTIVE",
+      activatedAt: new Date(),
+    },
+    select: { id: true, workspaceId: true, role: true, status: true },
+  });
+
+  return { workspace, membership };
+}
+
+// DEPRECATED: Kept for backward compatibility during migration
 async function createDefaultOrgForUser(userId: string, baseName: string) {
   const baseSlug = slugify(baseName);
   let slug = baseSlug;
@@ -103,18 +151,34 @@ export async function POST(req: Request) {
     },
   });
 
+  // Create Personal Workspace for new user
+  const workspaceName = parsed.data.name ?? email.split("@")[0] ?? "Personal";
+  const { workspace, membership } = await createPersonalWorkspaceForUser(
+    user.id,
+    workspaceName,
+  );
+
+  // Also create legacy Organization for backward compatibility (during migration)
+  // TODO: Remove this after full migration to Workspace model
   const orgName = parsed.data.name ?? email.split("@")[0] ?? "Organizacija";
-  const { org, membership } = await createDefaultOrgForUser(user.id, orgName);
+  const { org } = await createDefaultOrgForUser(user.id, orgName);
 
   const isAdmin = isAdminEmail(user.email);
   const token = signSession({
     sub: user.id,
     role: isAdmin ? "admin" : "facilitator",
-    orgId: membership.orgId,
-    orgRole: membership.role,
+    activeWorkspaceId: workspace.id,
+    workspaceRole: membership.role,
+    // Backward compatibility
+    orgId: org.id,
+    orgRole: "ORG_ADMIN",
   });
   const response = NextResponse.json(
-    { user, org: { id: org.id, name: org.name, slug: org.slug } },
+    {
+      user,
+      workspace: { id: workspace.id, name: workspace.name, type: workspace.type },
+      org: { id: org.id, name: org.name, slug: org.slug }, // Backward compatibility
+    },
     { status: 201 },
   );
   response.cookies.set(buildSessionCookie(token));

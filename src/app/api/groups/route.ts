@@ -3,6 +3,7 @@ import { z } from "zod";
 import { logAudit } from "@/lib/audit";
 import { generateGroupCode } from "@/lib/codes";
 import { requireRole } from "@/lib/guards";
+import { requireWorkspaceRole } from "@/lib/tenancy";
 import { prisma } from "@/lib/prisma";
 import { buildRateLimitKey, checkRateLimit } from "@/lib/rate-limit";
 
@@ -21,11 +22,12 @@ async function generateUniqueGroupCode() {
 }
 
 export async function POST(req: Request) {
-  const auth = await requireRole(req, "facilitator");
+  const auth = await requireRole(req, "facilitator", { requireOrg: false });
   if (!auth.ok) return auth.response;
-  if (!auth.session.orgId) {
-    return NextResponse.json({ error: "Missing organization" }, { status: 401 });
-  }
+
+  // Resolve workspace context and enforce role
+  const workspace = await requireWorkspaceRole(req, ["ORG_ADMIN", "STAFF", "OWNER"]);
+  if (!workspace.ok) return workspace.response;
 
   const limiterKey = buildRateLimitKey(req, "group-create");
   const allowed = checkRateLimit(limiterKey, 10, 60_000);
@@ -46,13 +48,25 @@ export async function POST(req: Request) {
   }
 
   const code = await generateUniqueGroupCode();
+  const legacyOrgId =
+    workspace.context.workspaceType === "ORGANIZATION"
+      ? workspace.context.workspaceId
+      : workspace.session.orgId;
+  if (!legacyOrgId) {
+    return NextResponse.json(
+      { error: "Organization context missing" },
+      { status: 400 },
+    );
+  }
   const group = await prisma.group.create({
     data: {
       name: parsed.data.name.trim(),
       description: parsed.data.description,
       code,
-      createdById: auth.session.sub,
-      orgId: auth.session.orgId,
+      createdById: workspace.session.sub,
+      workspaceId: workspace.context.workspaceId,
+      // Backward compatibility: also set orgId if available
+      orgId: legacyOrgId,
     },
     select: {
       id: true,
@@ -67,18 +81,38 @@ export async function POST(req: Request) {
     action: "group.create",
     targetType: "Group",
     targetId: group.id,
-    actorUserId: auth.session.sub,
+    actorUserId: workspace.session.sub,
+    workspaceId: workspace.context.workspaceId,
+    metadata: { workspaceId: workspace.context.workspaceId },
   });
 
   return NextResponse.json({ group }, { status: 201 });
 }
 
 export async function GET(req: Request) {
-  const auth = await requireRole(req, "facilitator");
+  const auth = await requireRole(req, "facilitator", { requireOrg: false });
   if (!auth.ok) return auth.response;
 
+  // Resolve workspace context and enforce role
+  const workspace = await requireWorkspaceRole(req, ["ORG_ADMIN", "STAFF", "OWNER"]);
+  if (!workspace.ok) return workspace.response;
+
+  const legacyOrgId =
+    workspace.context.workspaceType === "ORGANIZATION"
+      ? workspace.context.workspaceId
+      : workspace.session.orgId;
+
+  // Filter groups by workspace_id (with backward compatibility for orgId)
   const groups = await prisma.group.findMany({
-    where: { orgId: auth.session.orgId ?? undefined },
+    where: {
+      OR: [
+        { workspaceId: workspace.context.workspaceId },
+        // Backward compatibility: also check orgId if workspaceId is not set
+        ...(legacyOrgId
+          ? [{ orgId: legacyOrgId, workspaceId: null }]
+          : []),
+      ],
+    },
     orderBy: { createdAt: "desc" },
     select: {
       id: true,

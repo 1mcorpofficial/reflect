@@ -11,6 +11,77 @@ const loginSchema = z.object({
   password: z.string().min(8),
 });
 
+/**
+ * Ensures user has a Personal Workspace and returns active workspace context.
+ * Prefers Personal Workspace, falls back to first active workspace membership.
+ */
+async function ensureWorkspaceContext(userId: string) {
+  // First, try to find Personal Workspace
+  const personalMembership = await prisma.workspaceMembership.findFirst({
+    where: {
+      userId,
+      status: "ACTIVE",
+      workspace: { type: "PERSONAL" },
+    },
+    include: {
+      workspace: { select: { id: true, name: true, type: true } },
+    },
+  });
+
+  if (personalMembership) {
+    return {
+      workspaceId: personalMembership.workspaceId,
+      workspaceRole: personalMembership.role,
+      workspace: personalMembership.workspace,
+    };
+  }
+
+  // If no Personal Workspace, try any active workspace
+  const anyMembership = await prisma.workspaceMembership.findFirst({
+    where: { userId, status: "ACTIVE" },
+    include: {
+      workspace: { select: { id: true, name: true, type: true } },
+    },
+    orderBy: { activatedAt: "desc" },
+  });
+
+  if (anyMembership) {
+    return {
+      workspaceId: anyMembership.workspaceId,
+      workspaceRole: anyMembership.role,
+      workspace: anyMembership.workspace,
+    };
+  }
+
+  // If no workspace exists, create Personal Workspace (shouldn't happen after migration)
+  const workspace = await prisma.workspace.create({
+    data: {
+      type: "PERSONAL",
+      name: "Personal Workspace",
+      createdById: userId,
+    },
+    select: { id: true, name: true, type: true },
+  });
+
+  const membership = await prisma.workspaceMembership.create({
+    data: {
+      workspaceId: workspace.id,
+      userId,
+      role: "OWNER",
+      status: "ACTIVE",
+      activatedAt: new Date(),
+    },
+    select: { workspaceId: true, role: true },
+  });
+
+  return {
+    workspaceId: membership.workspaceId,
+    workspaceRole: membership.role,
+    workspace,
+  };
+}
+
+// DEPRECATED: Kept for backward compatibility during migration
 async function ensureOrgContext(userId: string) {
   const existing = await prisma.orgMember.findFirst({
     where: { userId, status: "ACTIVE" },
@@ -95,21 +166,32 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
-  const membership = await ensureOrgContext(user.id);
+  const workspaceContext = await ensureWorkspaceContext(user.id);
+  
+  // Also get legacy org context for backward compatibility
+  const orgContext = await ensureOrgContext(user.id);
 
   const isAdmin = isAdminEmail(user.email);
   const token = signSession({
     sub: user.id,
     role: isAdmin ? "admin" : "facilitator",
-    orgId: membership.orgId,
-    orgRole: membership.role,
+    activeWorkspaceId: workspaceContext.workspaceId,
+    workspaceRole: workspaceContext.workspaceRole,
+    // Backward compatibility
+    orgId: orgContext.orgId,
+    orgRole: orgContext.role,
   });
   const response = NextResponse.json(
     {
       user: { id: user.id, email: user.email, name: user.name },
-      org: membership.org
-        ? { id: membership.org.id, name: membership.org.name, slug: membership.org.slug }
-        : null,
+      workspace: {
+        id: workspaceContext.workspace.id,
+        name: workspaceContext.workspace.name,
+        type: workspaceContext.workspace.type,
+      },
+      org: orgContext.org
+        ? { id: orgContext.org.id, name: orgContext.org.name, slug: orgContext.org.slug }
+        : null, // Backward compatibility
     },
     { status: 200 },
   );

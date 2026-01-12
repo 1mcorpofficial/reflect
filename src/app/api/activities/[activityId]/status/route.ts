@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { logAudit } from "@/lib/audit";
 import { requireRole } from "@/lib/guards";
+import { requireWorkspaceRole, validateResourceWorkspace } from "@/lib/tenancy";
 import { prisma } from "@/lib/prisma";
 import { buildRateLimitKey, checkRateLimit } from "@/lib/rate-limit";
 
@@ -13,8 +14,11 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ activityId: string }> },
 ) {
-  const auth = await requireRole(req, "facilitator");
+  const auth = await requireRole(req, "facilitator", { requireOrg: false });
   if (!auth.ok) return auth.response;
+
+  const workspace = await requireWorkspaceRole(req, ["ORG_ADMIN", "STAFF", "OWNER"]);
+  if (!workspace.ok) return workspace.response;
 
   const limiterKey = buildRateLimitKey(req, "activity-status");
   const allowed = checkRateLimit(limiterKey, 10, 60_000);
@@ -35,16 +39,13 @@ export async function PATCH(
     );
   }
 
-  const activity = await prisma.activity.findUnique({
-    where: { id: activityId },
-    select: { id: true, createdById: true, group: { select: { orgId: true } } },
-  });
-
-  if (!activity) {
+  const belongsToWorkspace = await validateResourceWorkspace(
+    activityId,
+    "activity",
+    workspace.context.workspaceId,
+  );
+  if (!belongsToWorkspace) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-  if (auth.session.orgId && activity.group.orgId !== auth.session.orgId) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const update = await prisma.activity.update({
@@ -62,7 +63,8 @@ export async function PATCH(
     targetType: "Activity",
     targetId: activityId,
     actorUserId: auth.session.sub,
-    metadata: { status: parsed.data.status },
+    workspaceId: workspace.context.workspaceId,
+    metadata: { status: parsed.data.status, workspaceId: workspace.context.workspaceId },
   });
 
   return NextResponse.json({ activity: update });

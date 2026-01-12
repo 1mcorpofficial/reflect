@@ -13,10 +13,28 @@ export async function GET(req: Request) {
     );
   }
 
+  // Validate group exists and get workspaceId
+  const group = await prisma.group.findUnique({
+    where: { id: auth.session.groupId },
+    select: { workspaceId: true, orgId: true },
+  });
+
+  if (!group) {
+    return NextResponse.json({ error: "Group not found" }, { status: 404 });
+  }
+
+  // Build workspace filter (support backward compatibility with orgId)
+  const workspaceFilter = group.workspaceId
+    ? { workspaceId: group.workspaceId }
+    : group.orgId
+      ? { group: { orgId: group.orgId } }
+      : {};
+
   const activities = await prisma.activity.findMany({
     where: {
       groupId: auth.session.groupId,
       status: "PUBLISHED",
+      ...workspaceFilter,
     },
     orderBy: { createdAt: "desc" },
     select: {

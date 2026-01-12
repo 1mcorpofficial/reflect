@@ -1,24 +1,30 @@
 import { NextResponse } from "next/server";
 import { requireRole } from "@/lib/guards";
+import { requireWorkspaceRole, validateResourceWorkspace } from "@/lib/tenancy";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ groupId: string }> },
 ) {
-  const auth = await requireRole(req, "facilitator");
+  const auth = await requireRole(req, "facilitator", { requireOrg: false });
   if (!auth.ok) return auth.response;
 
+  // Resolve workspace context and enforce role
+  const workspace = await requireWorkspaceRole(req, ["ORG_ADMIN", "STAFF", "OWNER"]);
+  if (!workspace.ok) return workspace.response;
+
   const { groupId } = await params;
-  const group = await prisma.group.findUnique({
-    where: { id: groupId },
-    select: { id: true, createdById: true, orgId: true },
-  });
-  if (!group) {
+
+  // Validate that group belongs to workspace
+  const belongsToWorkspace = await validateResourceWorkspace(
+    groupId,
+    "group",
+    workspace.context.workspaceId,
+  );
+
+  if (!belongsToWorkspace) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-  if (auth.session.orgId && group.orgId !== auth.session.orgId) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const activities = await prisma.activity.findMany({

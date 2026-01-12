@@ -25,12 +25,42 @@ export async function POST(
   }
 
   const { userId } = await params;
+
+  // Get admin's workspace memberships
+  const adminMemberships = await prisma.workspaceMembership.findMany({
+    where: {
+      userId: auth.session.sub,
+      status: "ACTIVE",
+    },
+    select: { workspaceId: true },
+  });
+  const adminWorkspaceIds = adminMemberships.map((m) => m.workspaceId);
+
+  // Enforce workspace isolation: admin must have workspace memberships
+  if (adminWorkspaceIds.length === 0) {
+    return NextResponse.json({ error: "No workspace access" }, { status: 403 });
+  }
+
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { id: true, email: true },
   });
 
   if (!user) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  }
+
+  // Check if target user is in any of admin's workspaces (adminWorkspaceIds.length > 0 guaranteed)
+  const userMemberships = await prisma.workspaceMembership.findMany({
+    where: {
+      userId,
+      workspaceId: { in: adminWorkspaceIds },
+      status: "ACTIVE",
+    },
+    select: { workspaceId: true },
+  });
+
+  if (userMemberships.length === 0) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 

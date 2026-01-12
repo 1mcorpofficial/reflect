@@ -2,6 +2,8 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SESSION_COOKIE, verifySession } from "@/lib/auth";
+import { WorkspaceSwitcher } from "@/components/WorkspaceSwitcher";
+import { WorkspaceInfo } from "@/components/WorkspaceInfo";
 
 export default async function FacilitatorLayout({
   children,
@@ -26,14 +28,18 @@ export default async function FacilitatorLayout({
             </p>
             <h1 className="text-xl font-semibold">Reflectus</h1>
           </div>
-          <nav className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-            <Link className="hover:text-foreground" href="/facilitator">
-              Grupės
-            </Link>
-            <Link className="hover:text-foreground" href="/dashboard">
-              Analytics
-            </Link>
-          </nav>
+          <div className="flex flex-wrap items-center gap-3">
+            <nav className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+              <Link className="hover:text-foreground" href="/facilitator">
+                Grupės
+              </Link>
+              <Link className="hover:text-foreground" href="/dashboard">
+                Analytics
+              </Link>
+            </nav>
+            <WorkspaceInfo />
+            <WorkspaceSwitcher />
+          </div>
         </header>
         {children}
       </div>

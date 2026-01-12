@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { logAudit } from "@/lib/audit";
 import { requireRole } from "@/lib/guards";
+import { requireWorkspaceRole, validateResourceWorkspace } from "@/lib/tenancy";
 import { prisma } from "@/lib/prisma";
 import { buildRateLimitKey, checkRateLimit } from "@/lib/rate-limit";
 import { PDFDocument, StandardFonts } from "pdf-lib";
@@ -140,8 +141,11 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ activityId: string }> },
 ) {
-  const auth = await requireRole(req, "facilitator");
+  const auth = await requireRole(req, "facilitator", { requireOrg: false });
   if (!auth.ok) return auth.response;
+
+  const workspace = await requireWorkspaceRole(req, ["ORG_ADMIN", "STAFF", "OWNER"]);
+  if (!workspace.ok) return workspace.response;
 
   const { activityId } = await params;
   const limiterKey = buildRateLimitKey(req, "activity-export");
@@ -167,7 +171,6 @@ export async function GET(
       groupId: true,
       privacyMode: true,
       createdById: true,
-      group: { select: { orgId: true } },
       questionnaire: {
         select: {
           questions: { select: { id: true, prompt: true, order: true } },
@@ -179,9 +182,13 @@ export async function GET(
   if (!activity) {
     return NextResponse.json({ error: "Activity not found" }, { status: 404 });
   }
-
-  if (auth.session.orgId && activity.group.orgId !== auth.session.orgId) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const belongsToWorkspace = await validateResourceWorkspace(
+    activityId,
+    "activity",
+    workspace.context.workspaceId,
+  );
+  if (!belongsToWorkspace) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
   const responses = await prisma.response.findMany({
@@ -252,6 +259,7 @@ export async function GET(
       data: {
         groupId: activity.groupId,
         activityId: activity.id,
+        workspaceId: workspace.context.workspaceId,
         createdById: auth.session.sub,
         format: "CSV",
         status: "COMPLETED",
@@ -262,7 +270,8 @@ export async function GET(
       targetType: "Activity",
       targetId: activity.id,
       actorUserId: auth.session.sub,
-      metadata: { exportId: record.id },
+      workspaceId: workspace.context.workspaceId,
+      metadata: { exportId: record.id, workspaceId: workspace.context.workspaceId },
     });
     return new NextResponse(csv, {
       status: 200,
@@ -279,6 +288,7 @@ export async function GET(
       data: {
         groupId: activity.groupId,
         activityId: activity.id,
+        workspaceId: workspace.context.workspaceId,
         createdById: auth.session.sub,
         format: "XLSX",
         status: "COMPLETED",
@@ -289,7 +299,8 @@ export async function GET(
       targetType: "Activity",
       targetId: activity.id,
       actorUserId: auth.session.sub,
-      metadata: { exportId: record.id },
+      workspaceId: workspace.context.workspaceId,
+      metadata: { exportId: record.id, workspaceId: workspace.context.workspaceId },
     });
     return new NextResponse(buffer, {
       status: 200,
@@ -310,6 +321,7 @@ export async function GET(
       data: {
         groupId: activity.groupId,
         activityId: activity.id,
+        workspaceId: workspace.context.workspaceId,
         createdById: auth.session.sub,
         format: "PDF",
         status: "COMPLETED",
@@ -320,7 +332,8 @@ export async function GET(
       targetType: "Activity",
       targetId: activity.id,
       actorUserId: auth.session.sub,
-      metadata: { exportId: record.id },
+      workspaceId: workspace.context.workspaceId,
+      metadata: { exportId: record.id, workspaceId: workspace.context.workspaceId },
     });
     return new NextResponse(Buffer.from(pdfBytes), {
       status: 200,
@@ -335,6 +348,7 @@ export async function GET(
     data: {
       groupId: activity.groupId,
       activityId: activity.id,
+      workspaceId: workspace.context.workspaceId,
       createdById: auth.session.sub,
       format: "JSON",
       status: "COMPLETED",
@@ -345,7 +359,8 @@ export async function GET(
     targetType: "Activity",
     targetId: activity.id,
     actorUserId: auth.session.sub,
-    metadata: { exportId: record.id },
+    workspaceId: workspace.context.workspaceId,
+    metadata: { exportId: record.id, workspaceId: workspace.context.workspaceId },
   });
 
   return NextResponse.json({ responses: exportRows });

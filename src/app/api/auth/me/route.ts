@@ -26,6 +26,29 @@ export async function GET(req: Request) {
 
   const isAdmin = session.role === "admin" || isAdminEmail(user.email);
 
+  // Get workspace membership (new)
+  const workspaceMembership = session.activeWorkspaceId
+    ? await prisma.workspaceMembership.findUnique({
+        where: {
+          workspaceId_userId: {
+            workspaceId: session.activeWorkspaceId,
+            userId: session.sub,
+          },
+        },
+        include: {
+          workspace: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+              slug: true,
+            },
+          },
+        },
+      })
+    : null;
+
+  // Backward compatibility: get org membership
   const membership = session.orgId
     ? await prisma.orgMember.findUnique({
         where: { orgId_userId: { orgId: session.orgId, userId: session.sub } },
@@ -39,6 +62,9 @@ export async function GET(req: Request) {
 
   return NextResponse.json({
     user,
+    workspace: workspaceMembership?.workspace ?? null,
+    workspaceRole: workspaceMembership?.role ?? session.workspaceRole ?? null,
+    // Backward compatibility
     org: membership?.org ?? null,
     orgRole: membership?.role ?? null,
     role: session.role,

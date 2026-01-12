@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireRole } from "@/lib/guards";
+import { requireWorkspaceRole, validateResourceWorkspace } from "@/lib/tenancy";
 import { prisma } from "@/lib/prisma";
 import { QUESTION_CONFIG_SCHEMAS, type QuestionType } from "@/lib/question-types";
 import { createErrorResponse } from "@/lib/error-handler";
@@ -11,8 +12,12 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ activityId: string }> },
 ) {
-  const auth = await requireRole(req, "facilitator");
+  const auth = await requireRole(req, "facilitator", { requireOrg: false });
   if (!auth.ok) return auth.response;
+
+  // Resolve workspace context and enforce role
+  const workspace = await requireWorkspaceRole(req, ["ORG_ADMIN", "STAFF", "OWNER"]);
+  if (!workspace.ok) return workspace.response;
 
   try {
   const { activityId } = await params;
@@ -30,9 +35,10 @@ export async function GET(
     select: {
       id: true,
       groupId: true,
+      workspaceId: true,
       createdById: true,
       privacyMode: true,
-      group: { select: { orgId: true } },
+      group: { select: { orgId: true, workspaceId: true } },
       questionnaire: {
         select: {
           questions: {
@@ -54,8 +60,15 @@ export async function GET(
     return NextResponse.json({ error: "Activity not found" }, { status: 404 });
   }
 
-  if (auth.session.orgId && activity.group.orgId !== auth.session.orgId) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  // Validate that activity belongs to workspace
+  const belongsToWorkspace = await validateResourceWorkspace(
+    activityId,
+    "activity",
+    workspace.context.workspaceId,
+  );
+
+  if (!belongsToWorkspace) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
   const latestSnapshot =
